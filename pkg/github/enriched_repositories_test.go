@@ -34,7 +34,7 @@ func (client *enrichedRepositoriesMockClient) ListRepositoriesByOrg(_ context.Co
 
 func repositoryFixture(id int64, name string) *googlegithub.Repository {
 	now := googlegithub.Timestamp{Time: time.Date(2026, time.October, 6, 0, 0, 0, 0, time.UTC)}
-	customProperties := map[string]any{"ownership": "GFOG", "migration": nil}
+	customProperties := map[string]any{"ownership": "Governance", "migration": nil}
 	if name == "managed" {
 		customProperties = map[string]any{
 			"ownership": "Platform-Engineering",
@@ -91,7 +91,7 @@ func TestEnrichedRepositoriesFallsBackToObservedProperties(t *testing.T) {
 }
 
 func TestEnrichedRepositoriesRequiresSchemaForPropertyFilter(t *testing.T) {
-	_, err := getEnrichedRepositories(context.Background(), &enrichedRepositoriesMockClient{propertyError: errors.New("forbidden")}, "rwest", "", "ownership", "GFOG")
+	_, err := getEnrichedRepositories(context.Background(), &enrichedRepositoriesMockClient{propertyError: errors.New("forbidden")}, "rwest", "", "ownership", "Governance")
 	if err == nil {
 		t.Fatal("expected property filtering to fail when the schema is unavailable")
 	}
