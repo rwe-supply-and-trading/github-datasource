@@ -78,13 +78,16 @@ func timestampValue(value *googlegithub.Timestamp) *time.Time {
 }
 
 func getEnrichedRepositories(ctx context.Context, client enrichedRepositoriesClient, owner, repositoryFilter, propertyName, propertyValue string) (EnrichedRepositories, error) {
-	properties, err := getCustomProperties(ctx, client, owner, "")
-	if err != nil {
-		return EnrichedRepositories{}, fmt.Errorf("listing organization custom properties: %w", err)
-	}
 	repositories, err := listOrganizationRepositories(ctx, client, owner)
 	if err != nil {
 		return EnrichedRepositories{}, fmt.Errorf("listing organization repositories: %w", err)
+	}
+	properties, err := getCustomProperties(ctx, client, owner, "")
+	if err != nil {
+		if propertyName != "" && propertyValue != "" && propertyValue != "*" {
+			return EnrichedRepositories{}, fmt.Errorf("listing organization custom properties: %w", err)
+		}
+		properties = observedCustomProperties(repositories)
 	}
 
 	valueMap := make(map[string]map[string]any, len(repositories))
@@ -127,8 +130,31 @@ func customPropertyMatches(value any, expected string) bool {
 				return true
 			}
 		}
+	case []any:
+		for _, item := range typed {
+			if stringValue, ok := item.(string); ok && stringValue == expected {
+				return true
+			}
+		}
 	}
 	return false
+}
+
+func observedCustomProperties(repositories []*googlegithub.Repository) CustomProperties {
+	names := map[string]struct{}{}
+	for _, repository := range repositories {
+		for name := range repository.CustomProperties {
+			names[name] = struct{}{}
+		}
+	}
+	properties := make(CustomProperties, 0, len(names))
+	for name := range names {
+		properties = append(properties, &googlegithub.CustomProperty{PropertyName: googlegithub.Ptr(name)})
+	}
+	sort.SliceStable(properties, func(i, j int) bool {
+		return properties[i].GetPropertyName() < properties[j].GetPropertyName()
+	})
+	return properties
 }
 
 func listOrganizationRepositories(ctx context.Context, client enrichedRepositoriesClient, owner string) ([]*googlegithub.Repository, error) {
