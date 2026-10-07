@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	googlegithub "github.com/google/go-github/v84/github"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 
 	"github.com/grafana/github-datasource/pkg/dfutil"
@@ -271,7 +270,7 @@ func (d *Datasource) HandleOrganizationsQuery(ctx context.Context, query *models
 
 // CheckHealth is the health check for GitHub
 func (d *Datasource) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
-	_, _, err := d.client.ListAllOrgRepositories(ctx, &googlegithub.ListOptions{Page: 1, PerPage: 1})
+	_, err := d.client.CheckRepositoryAccess(ctx)
 	if err != nil {
 		if strings.Contains(err.Error(), "401 Unauthorized") {
 			return newHealthResult(backend.HealthStatusError, "401 Unauthorized. Check your API key/Access token")

@@ -3,6 +3,7 @@ package github
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"testing"
 	"time"
 
@@ -11,9 +12,13 @@ import (
 )
 
 type enrichedRepositoriesMockClient struct {
+	propertyError error
 }
 
 func (client *enrichedRepositoriesMockClient) GetOrganizationCustomProperties(context.Context, string) ([]*googlegithub.CustomProperty, *googlegithub.Response, error) {
+	if client.propertyError != nil {
+		return nil, &googlegithub.Response{}, client.propertyError
+	}
 	return []*googlegithub.CustomProperty{
 		{PropertyName: googlegithub.Ptr("ownership"), ValueType: googlegithub.PropertyValueTypeSingleSelect},
 		{PropertyName: googlegithub.Ptr("migration"), ValueType: googlegithub.PropertyValueTypeTrueFalse},
@@ -74,12 +79,33 @@ func TestEnrichedRepositoriesWildcardIncludesAllRepositories(t *testing.T) {
 	}
 }
 
+func TestEnrichedRepositoriesFallsBackToObservedProperties(t *testing.T) {
+	inventory, err := getEnrichedRepositories(context.Background(), &enrichedRepositoriesMockClient{propertyError: errors.New("forbidden")}, "rwest", "", "", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	frame := inventory.Frames()[0]
+	requireFrameField(t, frame, "ownership")
+	requireFrameField(t, frame, "migration")
+	requireFrameField(t, frame, "audiences")
+}
+
+func TestEnrichedRepositoriesRequiresSchemaForPropertyFilter(t *testing.T) {
+	_, err := getEnrichedRepositories(context.Background(), &enrichedRepositoriesMockClient{propertyError: errors.New("forbidden")}, "rwest", "", "ownership", "GFOG")
+	if err == nil {
+		t.Fatal("expected property filtering to fail when the schema is unavailable")
+	}
+}
+
 func TestCustomPropertyMatchesMultiSelect(t *testing.T) {
 	if !customPropertyMatches([]string{"internal", "platform"}, "platform") {
 		t.Fatal("expected multi-select property to match one selected value")
 	}
 	if customPropertyMatches([]string{"internal", "platform"}, "external") {
 		t.Fatal("unexpected multi-select property match")
+	}
+	if !customPropertyMatches([]any{"internal", "platform"}, "platform") {
+		t.Fatal("expected decoded multi-select property to match one selected value")
 	}
 }
 

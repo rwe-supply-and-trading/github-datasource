@@ -243,6 +243,24 @@ func (client *Client) ListAllOrgRepositories(ctx context.Context, opts *googlegi
 	return userRepositories, resp, err
 }
 
+// CheckRepositoryAccess verifies repository access with a single API request.
+func (client *Client) CheckRepositoryAccess(ctx context.Context) (*googlegithub.Response, error) {
+	opts := &googlegithub.ListOptions{Page: 1, PerPage: 1}
+	if client.authType == models.AuthTypeGithubApp {
+		_, resp, err := client.restClient.Apps.ListRepos(ctx, opts)
+		if err != nil {
+			return resp, addErrorSourceToError(err, resp)
+		}
+		return resp, nil
+	}
+
+	_, resp, err := client.restClient.Repositories.ListByAuthenticatedUser(ctx, &googlegithub.RepositoryListByAuthenticatedUserOptions{ListOptions: *opts})
+	if err != nil {
+		return resp, addErrorSourceToError(err, resp)
+	}
+	return resp, nil
+}
+
 // ListRepositoriesByOrg lists repositories owned by an organization.
 func (client *Client) ListRepositoriesByOrg(ctx context.Context, org string, opts *googlegithub.RepositoryListByOrgOptions) ([]*googlegithub.Repository, *googlegithub.Response, error) {
 	repositories, resp, err := client.restClient.Repositories.ListByOrg(ctx, org, opts)

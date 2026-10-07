@@ -160,6 +160,12 @@ The following repository permissions are required:
 | **Repository security advisories** | Read-only |
 | **Projects** | Read-only |
 
+The following organization permission is required for the **Repositories** and **CustomProperties** query types to return the complete custom-property schema:
+
+| Permission | Access level |
+|------------|-------------|
+| **Custom properties** | Read-only |
+
 ### Code scanning permissions
 
 To use the code scanning query type, the following additional permissions are required for both personal access tokens and GitHub Apps:
