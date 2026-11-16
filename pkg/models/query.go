@@ -46,7 +46,9 @@ const (
 	// QueryTypeWorkflowUsage is used when querying a specific workflow usage
 	QueryTypeWorkflowUsage QueryType = "Workflow_Usage"
 	// QueryTypeWorkflowRuns is used when querying workflow runs for a repository
-	QueryTypeWorkflowRuns QueryType = "Workflow_Runs"
+	QueryTypeWorkflowRuns  QueryType = "Workflow_Runs"
+	QueryTypeWorkflowJobs  QueryType = "Workflow_Jobs"
+	QueryTypeWorkflowSteps QueryType = "Workflow_Steps"
 	// QueryTypeCodeScanning is used when querying code scanning alerts for a repository
 	QueryTypeCodeScanning QueryType = "Code_Scanning"
 	// QueryTypeCodeSearch is used when searching repository contents
@@ -228,4 +230,10 @@ type PullRequestFilesQuery struct {
 type BranchesQuery struct {
 	Query
 	Options ListBranchesOptions `json:"options"`
+}
+
+// WorkflowJobsQuery addresses jobs within one exact run, or one exact job.
+type WorkflowJobsQuery struct {
+	Query
+	Options WorkflowJobsOptions `json:"options"`
 }

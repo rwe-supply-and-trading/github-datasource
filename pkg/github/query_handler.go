@@ -65,6 +65,8 @@ func GetQueryHandlers(s *QueryHandler) *datasource.QueryTypeMux {
 	register(models.QueryTypeWorkflows, s.HandleWorkflows)
 	register(models.QueryTypeWorkflowUsage, s.HandleWorkflowUsage)
 	register(models.QueryTypeWorkflowRuns, s.HandleWorkflowRuns)
+	register(models.QueryTypeWorkflowJobs, s.HandleWorkflowJobs)
+	register(models.QueryTypeWorkflowSteps, s.HandleWorkflowSteps)
 	register(models.QueryTypeCodeScanning, s.HandleCodeScanning)
 	register(models.QueryTypeCodeSearch, s.HandleCodeSearch)
 	register(models.QueryTypeDeployments, s.HandleDeployments)

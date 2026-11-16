@@ -27,6 +27,8 @@ export const QueryTypes = [
   'Workflows',
   'Workflow_Usage',
   'Workflow_Runs',
+  'Workflow_Jobs',
+  'Workflow_Steps',
   'Deployments',
 ] as const;
 

@@ -239,7 +239,13 @@ func (d *Datasource) HandleWorkflowRunsQuery(ctx context.Context, query *models.
 		Branch:     query.Options.Branch,
 	}
 
-	return GetWorkflowRuns(ctx, d.client, opt, req.TimeRange)
+	opt.Status = query.Options.Status
+	opt.MaxRuns = query.Options.MaxRuns
+	runs, limited, err := d.client.GetWorkflowRunResults(ctx, opt, req.TimeRange)
+	if err != nil {
+		return nil, err
+	}
+	return workflowRunResults{runs: WorkflowRunsWrapper(runs), limited: limited}, nil
 }
 
 // HandleDeploymentsQuery is the query handler for listing GitHub Deployments

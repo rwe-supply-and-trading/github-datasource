@@ -22,6 +22,7 @@ import { QueryEditorProjects } from './QueryEditorProjects';
 import { QueryEditorWorkflows } from './QueryEditorWorkflows';
 import { QueryEditorWorkflowUsage } from './QueryEditorWorkflowUsage';
 import { QueryEditorWorkflowRuns } from './QueryEditorWorkflowRuns';
+import { QueryEditorWorkflowJobs } from './QueryEditorWorkflowJobs';
 import { QueryEditorCodeScanning } from './QueryEditorCodeScanning';
 import { QueryEditorDeployments } from './QueryEditorDeployments';
 import { QueryEditorBranches } from './QueryEditorBranches';
@@ -138,6 +139,8 @@ const queryEditors: Record<QueryType, { component: (props: Props, onChange: (val
       <QueryEditorWorkflowUsage {...(props.query.options || {})} onChange={onChange} />
     ),
   },
+  ['Workflow_Jobs']: { component: (props: Props, onChange: (val: any) => void) => <QueryEditorWorkflowJobs {...(props.query.options || {})} onChange={onChange} /> },
+  ['Workflow_Steps']: { component: (props: Props, onChange: (val: any) => void) => <QueryEditorWorkflowJobs {...(props.query.options || {})} onChange={onChange} /> },
   ['Workflow_Runs']: {
     component: (props: Props, onChange: (val: any) => void) => (
       <QueryEditorWorkflowRuns {...(props.query.options || {})} onChange={onChange} />
