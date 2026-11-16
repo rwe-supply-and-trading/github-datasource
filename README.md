@@ -2,6 +2,15 @@
 
 The GitHub data source plugin for Grafana lets you to query the GitHub API in Grafana so you can visualize your GitHub repositories and projects.
 
+## Upstream alignment
+
+This private fork currently incorporates upstream `grafana/github-datasource`
+through `6f39c6429a7d9ab6a18e447ef51a2bf2cd1611f5` (checked 2026-11-16).
+Its release base is 2.10.0; the prepared RWE version is **2.10.0-rwe.1**.
+The RWE plugin identity, Enterprise Cloud data-residency support, governance
+queries and workflow job/step queries remain available. See
+[upstream alignment](docs/upstream-alignment.md) for the integration decisions.
+
 ## Documentation
 
 This fork adds GitHub Enterprise Cloud data-residency support to the upstream Grafana GitHub data source. See the [configuration guide](docs/sources/configure.md) for supported connection modes.

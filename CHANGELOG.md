@@ -1,5 +1,48 @@
 # Change Log
 
+## 2.10.0-rwe.1
+
+- Align the private fork with upstream main at 6f39c64, including Check Runs, Pull Requests for Branches, Webhook Deliveries, dependency/security fixes, and the multi-variable whitespace fix.
+- Preserve RWE plugin identity, private signing/release, Enterprise Cloud data residency, repository governance queries, and workflow job/step results.
+- Add workflow run attempt/state fields and bounded job/step queries; refresh the run result reference and add result/HTTP coverage.
+
+## 2.10.0
+
+🚀 Add Pull Requests for Branches query type
+
+⚙️ Chore: Updated frontend & backend dependencies
+
+## 2.9.6
+
+### Patch Changes
+
+🐛 Security: Updated frontend dependencies to fix dompurify, zod, source-map-js and launch-editor vulnerabilities.
+
+## 2.9.5
+
+⚙️ Chore: Updated backend dependencies
+
+## 2.9.4
+
+### Patch Changes
+
+⚙️ Chore: Prepare a patch release with the updated Go toolchain and golangci-lint 2.15.0 CI/CD configuration.
+
+## 2.9.3
+
+### Patch Changes
+
+🐛 Security: Updated frontend dependencies to fix brace-expansion and basic-ftp vulnerabilities.
+⚙️ Chore: Removed obsolete frontend dependency overrides.
+
+## 2.9.2
+
+### Patch Changes
+
+⚙️ Chore: Updated backend dependencies.
+⚙️ Chore: Publish data source configuration schemas for provisioning and automation.
+
+
 ## 2.9.2-rwe.2
 
 - Replace the legacy repository search with paginated organization metadata, custom-property columns, and property filtering.

@@ -13,6 +13,7 @@ import { QueryEditorCommitFiles } from './QueryEditorCommitFiles';
 import { QueryEditorIssues } from './QueryEditorIssues';
 import { QueryEditorMilestones } from './QueryEditorMilestones';
 import { QueryEditorPullRequests } from './QueryEditorPullRequests';
+import { QueryEditorPullRequestsForBranches } from './QueryEditorPullRequestsForBranches';
 import { QueryEditorPullRequestReviews } from './QueryEditorPullRequestReviews';
 import { QueryEditorPullRequestFiles } from './QueryEditorPullRequestFiles';
 import { QueryEditorContributors } from './QueryEditorContributors';
@@ -24,11 +25,13 @@ import { QueryEditorWorkflowUsage } from './QueryEditorWorkflowUsage';
 import { QueryEditorWorkflowRuns } from './QueryEditorWorkflowRuns';
 import { QueryEditorWorkflowJobs } from './QueryEditorWorkflowJobs';
 import { QueryEditorCodeScanning } from './QueryEditorCodeScanning';
+import { QueryEditorCheckRuns } from './QueryEditorCheckRuns';
 import { QueryEditorDeployments } from './QueryEditorDeployments';
 import { QueryEditorBranches } from './QueryEditorBranches';
 import { QueryEditorRepositories } from './QueryEditorRepositories';
 import { QueryEditorCustomProperties } from './QueryEditorCustomProperties';
 import { QueryEditorCodeSearch } from './QueryEditorCodeSearch';
+import { QueryEditorWebhookDeliveries } from './QueryEditorWebhookDeliveries';
 
 import { DefaultQueryType, QueryTypes } from '../constants';
 
@@ -84,6 +87,11 @@ const queryEditors: Record<QueryType, { component: (props: Props, onChange: (val
       <QueryEditorCodeSearch {...(props.query.options || {})} onChange={onChange} />
     ),
   },
+  ['Check_Runs']: {
+    component: (props: Props, onChange: (val: any) => void) => (
+      <QueryEditorCheckRuns {...(props.query.options || {})} onChange={onChange} />
+    ),
+  },
   ['Commits']: {
     component: (props: Props, onChange: (val: any) => void) => (
       <QueryEditorCommits {...(props.query.options || {})} onChange={onChange} />
@@ -112,6 +120,11 @@ const queryEditors: Record<QueryType, { component: (props: Props, onChange: (val
   ['Pull_Requests']: {
     component: (props: Props, onChange: (val: any) => void) => (
       <QueryEditorPullRequests {...(props.query.options || {})} onChange={onChange} />
+    ),
+  },
+  ['Pull_Requests_For_Branches']: {
+    component: (props: Props, onChange: (val: any) => void) => (
+      <QueryEditorPullRequestsForBranches {...(props.query.options || {})} onChange={onChange} />
     ),
   },
   ['Pull_Request_Reviews']: {
@@ -149,6 +162,11 @@ const queryEditors: Record<QueryType, { component: (props: Props, onChange: (val
   ['Deployments']: {
     component: (props: Props, onChange: (val: any) => void) => (
       <QueryEditorDeployments {...(props.query.options || {})} onChange={onChange} />
+    ),
+  },
+  ['Webhook_Deliveries']: {
+    component: (props: Props, onChange: (val: any) => void) => (
+      <QueryEditorWebhookDeliveries {...(props.query.options || {})} onChange={onChange} />
     ),
   },
 };

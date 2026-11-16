@@ -37,6 +37,7 @@
     "ghinstallation",
     "githubclient",
     "githubv",
+    "golangci",
     "googlegithub",
     "grafana",
     "grafanabot",

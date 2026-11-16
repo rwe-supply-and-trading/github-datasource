@@ -8,15 +8,15 @@
 //      "preferredVisualisationType": "table"
 //  }
 //  Name: workflow_run
-//  Dimensions: 14 Fields by 2 Rows
-//  +----------------+-----------------+-------------------+-----------------+-------------------------------+-------------------------------+-------------------------------+-----------------+-----------------+-----------------+------------------+-----------------+-------------------+------------------+
-//  | Name: id       | Name: name      | Name: head_branch | Name: head_sha  | Name: created_at              | Name: updated_at              | Name: run_started_at          | Name: html_url  | Name: url       | Name: status    | Name: conclusion | Name: event     | Name: workflow_id | Name: run_number |
-//  | Labels:        | Labels:         | Labels:           | Labels:         | Labels:                       | Labels:                       | Labels:                       | Labels:         | Labels:         | Labels:         | Labels:          | Labels:         | Labels:           | Labels:          |
-//  | Type: []*int64 | Type: []*string | Type: []*string   | Type: []*string | Type: []*time.Time            | Type: []*time.Time            | Type: []*time.Time            | Type: []*string | Type: []*string | Type: []*string | Type: []*string  | Type: []*string | Type: []*int64    | Type: []int64    |
-//  +----------------+-----------------+-------------------+-----------------+-------------------------------+-------------------------------+-------------------------------+-----------------+-----------------+-----------------+------------------+-----------------+-------------------+------------------+
-//  | 2              | name_2          | head_branch_2     | head_sha_2      | 2013-02-03 00:00:00 +0000 UTC | 2013-02-04 00:00:00 +0000 UTC | 2013-02-04 00:00:00 +0000 UTC | html_url_2      | url_2           | status_2        | conclusion_2     | event_2         | 2                 | 2                |
-//  | 1              | name_1          | head_branch_1     | head_sha_1      | 2013-02-01 00:00:00 +0000 UTC | 2013-02-02 00:00:00 +0000 UTC | 2013-02-02 00:00:00 +0000 UTC | html_url_1      | url_1           | status_1        | conclusion_1     | event_1         | 1                 | 1                |
-//  +----------------+-----------------+-------------------+-----------------+-------------------------------+-------------------------------+-------------------------------+-----------------+-----------------+-----------------+------------------+-----------------+-------------------+------------------+
+//  Dimensions: 17 Fields by 2 Rows
+//  +----------------+-----------------+-----------------------+-------------------+-----------------+-------------------------------+-------------------------------+-------------------------------+-----------------+-----------------+-----------------+------------------+----------------+-----------------+-------------------+------------------+-------------------+
+//  | Name: id       | Name: name      | Name: display_name    | Name: head_branch | Name: head_sha  | Name: created_at              | Name: updated_at              | Name: run_started_at          | Name: html_url  | Name: url       | Name: status    | Name: conclusion | Name: state    | Name: event     | Name: workflow_id | Name: run_number | Name: run_attempt |
+//  | Labels:        | Labels:         | Labels:               | Labels:           | Labels:         | Labels:                       | Labels:                       | Labels:                       | Labels:         | Labels:         | Labels:         | Labels:          | Labels:        | Labels:         | Labels:           | Labels:          | Labels:           |
+//  | Type: []*int64 | Type: []*string | Type: []string        | Type: []*string   | Type: []*string | Type: []*time.Time            | Type: []*time.Time            | Type: []*time.Time            | Type: []*string | Type: []*string | Type: []*string | Type: []*string  | Type: []string | Type: []*string | Type: []*int64    | Type: []int64    | Type: []int64     |
+//  +----------------+-----------------+-----------------------+-------------------+-----------------+-------------------------------+-------------------------------+-------------------------------+-----------------+-----------------+-----------------+------------------+----------------+-----------------+-------------------+------------------+-------------------+
+//  | 1              | name_1          | name_1 #1 · attempt 2 | head_branch_1     | head_sha_1      | 2013-02-01 00:00:00 +0000 UTC | 2013-02-02 00:00:00 +0000 UTC | 2013-02-02 00:00:00 +0000 UTC | html_url_1      | url_1           | completed       | failure          | failure        | event_1         | 1                 | 1                | 2                 |
+//  | 2              | name_2          | name_2 #2 · attempt 1 | head_branch_2     | head_sha_2      | 2013-02-03 00:00:00 +0000 UTC | 2013-02-04 00:00:00 +0000 UTC | 2013-02-04 00:00:00 +0000 UTC | html_url_2      | url_2           | in_progress     | null             | in_progress    | event_2         | 2                 | 2                | 1                 |
+//  +----------------+-----------------+-----------------------+-------------------+-----------------+-------------------------------+-------------------------------+-------------------------------+-----------------+-----------------+-----------------+------------------+----------------+-----------------+-------------------+------------------+-------------------+
 //  
 //  
 //  🌟 This was machine generated.  Do not edit. 🌟
@@ -48,6 +48,13 @@
             "typeInfo": {
               "frame": "string",
               "nullable": true
+            }
+          },
+          {
+            "name": "display_name",
+            "type": "string",
+            "typeInfo": {
+              "frame": "string"
             }
           },
           {
@@ -123,6 +130,13 @@
             }
           },
           {
+            "name": "state",
+            "type": "string",
+            "typeInfo": {
+              "frame": "string"
+            }
+          },
+          {
             "name": "event",
             "type": "string",
             "typeInfo": {
@@ -144,62 +158,81 @@
             "typeInfo": {
               "frame": "int64"
             }
+          },
+          {
+            "name": "run_attempt",
+            "type": "number",
+            "typeInfo": {
+              "frame": "int64"
+            }
           }
         ]
       },
       "data": {
         "values": [
           [
-            2,
-            1
+            1,
+            2
           ],
           [
-            "name_2",
-            "name_1"
+            "name_1",
+            "name_2"
           ],
           [
-            "head_branch_2",
-            "head_branch_1"
+            "name_1 #1 · attempt 2",
+            "name_2 #2 · attempt 1"
           ],
           [
-            "head_sha_2",
-            "head_sha_1"
+            "head_branch_1",
+            "head_branch_2"
           ],
           [
-            1359849600000,
-            1359676800000
+            "head_sha_1",
+            "head_sha_2"
           ],
           [
-            1359936000000,
-            1359763200000
+            1359676800000,
+            1359849600000
           ],
           [
-            1359936000000,
-            1359763200000
+            1359763200000,
+            1359936000000
           ],
           [
-            "html_url_2",
-            "html_url_1"
+            1359763200000,
+            1359936000000
           ],
           [
-            "url_2",
-            "url_1"
+            "html_url_1",
+            "html_url_2"
           ],
           [
-            "status_2",
-            "status_1"
+            "url_1",
+            "url_2"
           ],
           [
-            "conclusion_2",
-            "conclusion_1"
+            "completed",
+            "in_progress"
           ],
           [
-            "event_2",
-            "event_1"
+            "failure",
+            null
           ],
           [
-            2,
-            1
+            "failure",
+            "in_progress"
+          ],
+          [
+            "event_1",
+            "event_2"
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            2
           ],
           [
             2,

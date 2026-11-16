@@ -1,5 +1,5 @@
 import { type DataQuery } from '@grafana/schema';
-import { PullRequestTimeField, IssueTimeField, WorkflowsTimeField, PackageType, ProjectQueryType, QueryTypes } from '../constants';
+import { PullRequestTimeField, IssueTimeField, WorkflowsTimeField, PackageType, ProjectQueryType, QueryTypes, WebhookDeliveryStatus } from '../constants';
 import type { Filter } from 'components/Filters';
 
 export type QueryType = typeof QueryTypes[number]
@@ -80,6 +80,13 @@ export type Pull_RequestsOptions = Options & {
   query?: string;
 }
 type Pull_RequestsQuery = BaseQuery<'Pull_Requests', Pull_RequestsOptions>
+//#endregion
+
+//#region Pull_Requests_For_Branches Query
+export type Pull_Requests_For_BranchesOptions = Options & {
+  branches?: string[];
+}
+type Pull_Requests_For_BranchesQuery = BaseQuery<'Pull_Requests_For_Branches', Pull_Requests_For_BranchesOptions>
 //#endregion
 
 //#region Pull_Request_Files Query
@@ -203,7 +210,27 @@ export type DeploymentsOptions = Options & {
 type DeploymentsQuery = BaseQuery<'Deployments', DeploymentsOptions>
 //#endregion
 
+//#region Check_Runs Query
+export type CheckRunsOptions = Options & {
+  gitRef?: string;
+  checkName?: string;
+  status?: string;
+  filter?: string;
+}
+type Check_RunsQuery = BaseQuery<'Check_Runs', CheckRunsOptions>
+//#endregion
+
+//#region Webhook_Deliveries Query
+export type WebhookDeliveriesOptions = Options & {
+  hookId?: string;
+  event?: string;
+  status?: WebhookDeliveryStatus;
+}
+type Webhook_DeliveriesQuery = BaseQuery<'Webhook_Deliveries', WebhookDeliveriesOptions>
+//#endregion
+
 export type GitHubQuery =
+  Check_RunsQuery |
   Code_ScanningQuery |
   Code_SearchQuery |
   CommitsQuery |
@@ -213,6 +240,7 @@ export type GitHubQuery =
   TagsQuery |
   ReleasesQuery |
   Pull_RequestsQuery |
+  Pull_Requests_For_BranchesQuery |
   Pull_Request_ReviewsQuery |
   Pull_Request_FilesQuery |
   LabelsQuery |
@@ -232,7 +260,8 @@ export type GitHubQuery =
   Workflow_UsageQuery |
   WorkflowsQuery |
   DeploymentsQuery |
-  BranchesQuery
+  BranchesQuery |
+  Webhook_DeliveriesQuery
 
 export type GitHubVariableQuery = { key?: string; field?: string; } & GitHubQuery
 

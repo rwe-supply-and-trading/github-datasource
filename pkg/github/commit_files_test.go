@@ -74,6 +74,10 @@ func (m *commitFilesMockClient) ListPullRequestFiles(_ context.Context, owner, r
 	return p.files, resp, nil
 }
 
+func (m *commitFilesMockClient) ListCheckRunsForRef(_ context.Context, _, _, _ string, _ *googlegithub.ListCheckRunsOptions) (*googlegithub.ListCheckRunsResults, *googlegithub.Response, error) {
+	return nil, nil, nil
+}
+
 func TestGetCommitFiles(t *testing.T) {
 	ctx := context.Background()
 	opts := models.CommitFilesOptions{
@@ -255,4 +259,12 @@ func TestCommitFilesFrames(t *testing.T) {
 	})
 
 	testutil.CheckGoldenFramer(t, "commit_files", files)
+}
+
+func (m *commitFilesMockClient) ListOrgHookDeliveries(_ context.Context, _ string, _ int64, _ *googlegithub.ListCursorOptions) ([]*googlegithub.HookDelivery, *googlegithub.Response, error) {
+	return nil, nil, nil
+}
+
+func (m *commitFilesMockClient) ListRepoHookDeliveries(_ context.Context, _, _ string, _ int64, _ *googlegithub.ListCursorOptions) ([]*googlegithub.HookDelivery, *googlegithub.Response, error) {
+	return nil, nil, nil
 }
