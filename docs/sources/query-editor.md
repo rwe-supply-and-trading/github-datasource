@@ -32,6 +32,7 @@ This document describes the query types and response fields available in the Git
 Select a query type from the **Query Type** drop-down in the query editor:
 
 - [**Branches**](#branches): List branches for a repository, with optional name filtering.
+- [**Check runs**](#check-runs): List check runs for a commit, branch, or tag, including status, conclusion, and duration.
 - [**Code scanning**](#code-scanning): Query code scanning alerts for a repository or organization.
 - [**Code search**](#code-search): Search files and content across repositories using GitHub code-search syntax.
 - [**Commit files**](#commit-files): List files changed in a specific commit.
@@ -45,6 +46,7 @@ Select a query type from the **Query Type** drop-down in the query editor:
 - [**Projects**](#projects): List projects associated with a user or organization.
 - [**Pull request files**](#pull-request-files): List files changed in a specific pull request.
 - [**Pull requests**](#pull-requests): List pull requests for a repository, using the GitHub query syntax to filter the response.
+- [**Pull requests for branches**](#pull-requests-for-branches): Look up the pull requests opened from up to 100 branches of a repository.
 - [**Pull request reviews**](#pull-request-reviews): List reviews for pull requests in a repository.
 - [**Releases**](#releases): List created releases for a repository.
 - [**Repositories**](#repositories): List organization repositories with custom properties.
@@ -52,6 +54,7 @@ Select a query type from the **Query Type** drop-down in the query editor:
 - [**Stargazers**](#stargazers): Get a list of users who have starred a repository, including the ability to plot a total count over time.
 - [**Tags**](#tags): List created tags for a repository.
 - [**Vulnerabilities**](#vulnerabilities): Query security vulnerabilities detected in a repository.
+- [**Webhook deliveries**](#webhook-deliveries): List deliveries of an organization or repository webhook, including the response status code.
 - [**Workflows**](#workflows): List GitHub Actions workflows defined in a repository.
 - [**Workflow runs**](#workflow-runs): List runs for a specific workflow, including status, conclusion, and timing information.
 - [**Workflow usage**](#workflow-usage): Retrieve usage statistics for a workflow, such as run counts and durations.
@@ -233,6 +236,48 @@ The response includes one row per changed file:
 | changes | Total number of line changes |
 | status | Change type: `added`, `modified`, `renamed`, etc. |
 | previous_filename | Original path for renamed files |
+
+### Check runs
+
+List check runs for a git reference. Check runs are the individual checks reported against a commit by GitHub Apps, such as GitHub Actions jobs, and include the status, conclusion, and how long each check took.
+
+{{< admonition type="note" >}}
+The reference can be a commit SHA, a branch formatted as `heads/<branch name>`, or a tag formatted as `tags/<tag name>`.
+{{< /admonition >}}
+
+#### Query options
+
+| Name | Description | Required |
+|------|-------------|----------|
+| Owner | The GitHub user or organization that owns the repository | Yes |
+| Repository | The name of the repository | Yes |
+| Ref | The commit SHA, branch, or tag to list check runs for | Yes |
+| Check name | Only return check runs with this exact name | No |
+| Status | Only return check runs with the given status: `queued`, `in_progress`, or `completed` | No |
+| Filter | `latest` returns the most recent check run for each name, `all` returns every check run. Defaults to `latest` | No |
+
+#### Response
+
+The response includes one row per check run:
+
+| Name | Description |
+|------|-------------|
+| id | Unique identifier of the check run |
+| name | Name of the check run |
+| head_sha | SHA of the commit the check run is associated with |
+| status | Current status: `queued`, `in_progress`, or `completed` |
+| conclusion | Result of a completed check run, such as `success`, `failure`, `neutral`, `cancelled`, `skipped`, `timed_out`, or `action_required` |
+| started_at | Time the check run started |
+| completed_at | Time the check run completed, empty while it is still running |
+| duration_seconds | How long the check run took in seconds, empty while it is still running |
+| html_url | URL of the check run on GitHub |
+| details_url | URL of the external site with the full check run details |
+| app_name | Name of the GitHub App that created the check run |
+| app_slug | Slug of the GitHub App that created the check run |
+| check_suite_id | Identifier of the check suite the check run belongs to |
+| output_title | Title of the check run output |
+| output_summary | Summary of the check run output |
+| annotations_count | Number of annotations attached to the check run |
 
 ### Contributors
 
@@ -655,6 +700,37 @@ The response includes one row per changed file:
 | status | Change type: `added`, `modified`, `renamed`, etc. |
 | previous_filename | Original path for renamed files |
 
+### Pull requests for branches
+
+Look up the pull requests opened from a list of branches. All branches are looked up in one GitHub GraphQL request. In the query editor, enter the branches as a comma-separated list; through the data source query API (`/api/ds/query`), send `queryType: "Pull_Requests_For_Branches"` with `options.branches`.
+
+#### Query options
+
+| Name | Description | Required |
+|------|-------------|----------|
+| `owner` | The GitHub user or organization that owns the repository | Yes |
+| `repository` | The name of the repository | Yes |
+| `options.branches` (**Branches**) | Head branch names to look up, at most 100 | Yes |
+
+The **Branches** field accepts dashboard variables. A multi-value variable such as `$branches` expands to one branch per selected value.
+
+#### Response
+
+The response includes one row per pull request, with at most the five newest pull requests per branch. Branches without a pull request return no rows.
+
+| Name | Description |
+|------|-------------|
+| repository | Repository the pull requests belong to (`owner/name`) |
+| head_ref | Branch the pull request was opened from |
+| number | Pull request number |
+| state | `OPEN`, `CLOSED`, or `MERGED` |
+| created_at | When the pull request was opened |
+| merged_at | When the pull request was merged, if it was |
+| closed_at | When the pull request was closed, if it was |
+| base_ref | Branch the pull request targets |
+| head_repository | Repository the head branch lives in (`owner/name`); differs from `repository` for forks, empty if the fork was deleted |
+| default_branch | The repository's default branch |
+
 ### Pull request reviews
 
 List reviews for pull requests in a repository. This query returns one row per review, with the associated pull request details included. Useful for tracking review activity, reviewer workload, and review turnaround time.
@@ -938,6 +1014,58 @@ Show all security advisories for the `grafana/grafana` repository:
 | permalink | URL to the GitHub Security Advisory or alert |
 | severity | Severity level: `LOW`, `MODERATE`, `HIGH`, or `CRITICAL` |
 | state | State of the vulnerability alert: `OPEN`, `FIXED`, or `DISMISSED` |
+
+### Webhook deliveries
+
+List deliveries of an organization or repository webhook, one row per delivery. Useful for tracking webhook reliability: plot the success rate of an automation webhook over time, or alert when failures pass a threshold.
+
+{{< admonition type="note" >}}
+GitHub only keeps webhook deliveries for the past 3 days, so a longer dashboard time range returns only the deliveries that are left. This query also requires a token with the `admin:org_hook` scope for organization webhooks, or `admin:repo_hook` for repository webhooks.
+{{< /admonition >}}
+
+To find the ID of a webhook, run `gh api /orgs/<org>/hooks` for an organization webhook, or `gh api /repos/<owner>/<repository>/hooks` for a repository webhook.
+
+#### Query options
+
+| Name | Description | Required |
+|------|-------------|----------|
+| Owner | Organization the webhook belongs to, or GitHub user or organization that owns the repository | Yes |
+| Repository | Name of the repository. Leave it empty to query an organization webhook | No |
+| Hook ID | Numeric ID of the webhook | Yes |
+| Event | Only return deliveries triggered by this event (for example, `pull_request`) | No |
+| Status | Filter deliveries by outcome: `All`, `Success` (a 2xx response), or `Failure` (any other response, including deliveries that never got one) | No |
+
+##### Sample queries
+
+Show all deliveries of an organization webhook:
+
+- Owner: `grafana`
+- Hook ID: `12345678`
+
+Show failed `pull_request` deliveries of a repository webhook:
+
+- Owner: `grafana`
+- Repository: `grafana`
+- Hook ID: `12345678`
+- Event: `pull_request`
+- Status: `Failure`
+
+#### Response
+
+| Name | Description |
+|------|-------------|
+| delivered_at | When the delivery was attempted: YYYY-MM-DD HH:MM:SS |
+| id | Unique identifier for the delivery |
+| guid | Identifier shared by a delivery and all of its redeliveries |
+| event | Event that triggered the delivery (for example, `pull_request`) |
+| action | Action of the event, if applicable (for example, `opened`) |
+| status | Description of the response (for example, `OK`) |
+| status_code | HTTP status code the webhook endpoint responded with |
+| duration | How long the delivery took, in seconds |
+| redelivery | Whether the delivery is a redelivery of an earlier one |
+| repository_id | ID of the repository the event came from. The delivery does not include the repository name |
+| installation_id | ID of the GitHub App installation, if the webhook belongs to one |
+| success | Whether the endpoint responded with a 2xx status code |
 
 ### Workflows
 

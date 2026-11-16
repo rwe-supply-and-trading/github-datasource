@@ -1,6 +1,7 @@
 import { QueryType } from './types/query'
 
 export const QueryTypes = [
+  'Check_Runs',
   'Code_Scanning',
   'Code_Search',
   'Commits',
@@ -11,6 +12,7 @@ export const QueryTypes = [
   'Branches',
   'Releases',
   'Pull_Requests',
+  'Pull_Requests_For_Branches',
   'Pull_Request_Reviews',
   'Pull_Request_Files',
   'Labels',
@@ -27,7 +29,10 @@ export const QueryTypes = [
   'Workflows',
   'Workflow_Usage',
   'Workflow_Runs',
+  'Workflow_Jobs',
+  'Workflow_Steps',
   'Deployments',
+  'Webhook_Deliveries',
 ] as const;
 
 
@@ -66,4 +71,10 @@ export enum WorkflowsTimeField {
 export enum ProjectQueryType {
   ORG = 0,
   USER = 1,
+}
+
+export enum WebhookDeliveryStatus {
+  All = 'all',
+  Success = 'success',
+  Failure = 'failure',
 }

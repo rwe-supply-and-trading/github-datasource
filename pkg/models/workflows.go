@@ -41,7 +41,20 @@ type WorkflowUsageOptions struct {
 	Branch string `json:"branch"`
 }
 
-type WorkflowRunsOptions = WorkflowUsageOptions
+type WorkflowRunsOptions struct {
+	Owner      string `json:"owner"`
+	Repository string `json:"repository"`
+	Workflow   string `json:"workflow"`
+	Branch     string `json:"branch"`
+	Status     string `json:"status"`
+	MaxRuns    int    `json:"maxRuns"`
+}
+
+type WorkflowJobsOptions struct {
+	RunID   string `json:"runId"`
+	JobID   string `json:"jobId"`
+	Attempt string `json:"attempt"`
+}
 
 // WorkflowUsage contains a specific workflow usage information.
 type WorkflowUsage struct {

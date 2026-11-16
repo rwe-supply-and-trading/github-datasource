@@ -97,6 +97,10 @@ func (m *mockClient) ListPullRequestFiles(ctx context.Context, owner, repo strin
 	return nil, nil, nil
 }
 
+func (m *mockClient) ListCheckRunsForRef(ctx context.Context, owner, repo, ref string, opts *googlegithub.ListCheckRunsOptions) (*googlegithub.ListCheckRunsResults, *googlegithub.Response, error) {
+	return nil, nil, nil
+}
+
 func TestGetCodeScanningAlerts(t *testing.T) {
 	var (
 		ctx  = context.Background()
@@ -296,4 +300,12 @@ func equalInts(a, b []int) bool {
 		}
 	}
 	return true
+}
+
+func (m *mockClient) ListOrgHookDeliveries(_ context.Context, _ string, _ int64, _ *googlegithub.ListCursorOptions) ([]*googlegithub.HookDelivery, *googlegithub.Response, error) {
+	return nil, nil, nil
+}
+
+func (m *mockClient) ListRepoHookDeliveries(_ context.Context, _, _ string, _ int64, _ *googlegithub.ListCursorOptions) ([]*googlegithub.HookDelivery, *googlegithub.Response, error) {
+	return nil, nil, nil
 }

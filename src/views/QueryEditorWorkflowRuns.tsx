@@ -11,6 +11,8 @@ interface Props extends WorkflowRunsOptions {
 export const QueryEditorWorkflowRuns = (props: Props) => {
   const [workflow, setWorkflow] = useState<string | undefined>(props.workflow);
   const [branch, setBranch] = useState<string | undefined>(props.branch);
+  const [status, setStatus] = useState(props.status || '');
+  const [maxRuns, setMaxRuns] = useState(props.maxRuns || 100);
 
   return (
     <EditorRow>
@@ -39,6 +41,12 @@ export const QueryEditorWorkflowRuns = (props: Props) => {
             })
           }
         />
+      </EditorField>
+      <EditorField label="Result / status" tooltip="GitHub status or conclusion, for example failure, cancelled or in_progress. Empty includes all.">
+        <Input value={status} onChange={el => setStatus(el.currentTarget.value)} onBlur={el => props.onChange({...props,status:el.currentTarget.value})} />
+      </EditorField>
+      <EditorField label="Maximum runs" tooltip="Bounded to 1–1000 runs; defaults to 100. A warning identifies truncated lists.">
+        <Input type="number" min={1} max={1000} value={maxRuns} onChange={el => setMaxRuns(Number(el.currentTarget.value))} onBlur={el => props.onChange({...props,maxRuns:Number(el.currentTarget.value)})} />
       </EditorField>
     </EditorRow>
   );

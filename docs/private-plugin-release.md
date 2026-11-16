@@ -136,7 +136,7 @@ Use a fork-specific semantic version. For the next release, run locally with the
 
 ```bash
 nvm use
-npm version 2.9.2-rwe.2 --no-git-tag-version
+npm version 2.10.0-rwe.1 --no-git-tag-version
 ```
 
 Then:

@@ -227,6 +227,7 @@ func (workflowRuns WorkflowRunsWrapper) Frames() data.Frames {
 		"workflow_run",
 		data.NewField("id", nil, []*int64{}),
 		data.NewField("name", nil, []*string{}),
+		data.NewField("display_name", nil, []string{}),
 		data.NewField("head_branch", nil, []*string{}),
 		data.NewField("head_sha", nil, []*string{}),
 		data.NewField("created_at", nil, []*time.Time{}),
@@ -236,16 +237,18 @@ func (workflowRuns WorkflowRunsWrapper) Frames() data.Frames {
 		data.NewField("url", nil, []*string{}),
 		data.NewField("status", nil, []*string{}),
 		data.NewField("conclusion", nil, []*string{}),
+		data.NewField("state", nil, []string{}),
 		data.NewField("event", nil, []*string{}),
 		data.NewField("workflow_id", nil, []*int64{}),
 		data.NewField("run_number", nil, []int64{}),
+		data.NewField("run_attempt", nil, []int64{}),
 	)
 
 	for _, workflowRun := range workflowRuns {
-		frame.InsertRow(
-			0,
+		frame.AppendRow(
 			workflowRun.ID,
 			workflowRun.Name,
+			fmt.Sprintf("%s #%d · attempt %d", workflowRun.GetName(), workflowRun.GetRunNumber(), workflowRun.GetRunAttempt()),
 			workflowRun.HeadBranch,
 			workflowRun.HeadSHA,
 			workflowRun.CreatedAt.GetTime(),
@@ -255,9 +258,11 @@ func (workflowRuns WorkflowRunsWrapper) Frames() data.Frames {
 			workflowRun.URL,
 			workflowRun.Status,
 			workflowRun.Conclusion,
+			workflowResultState(workflowRun.GetStatus(), workflowRun.GetConclusion()),
 			workflowRun.Event,
 			workflowRun.WorkflowID,
-			int64(*workflowRun.RunNumber),
+			int64(workflowRun.GetRunNumber()),
+			int64(workflowRun.GetRunAttempt()),
 		)
 	}
 

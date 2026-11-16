@@ -59,6 +59,9 @@ func (m *mockDeploymentsClient) GetCommitFiles(_ context.Context, _, _, _ string
 func (m *mockDeploymentsClient) ListPullRequestFiles(_ context.Context, _, _ string, _ int, _ *googlegithub.ListOptions) ([]*googlegithub.CommitFile, *googlegithub.Response, error) {
 	return nil, nil, nil
 }
+func (m *mockDeploymentsClient) ListCheckRunsForRef(_ context.Context, _, _, _ string, _ *googlegithub.ListCheckRunsOptions) (*googlegithub.ListCheckRunsResults, *googlegithub.Response, error) {
+	return nil, nil, nil
+}
 
 func TestGetAllDeployments(t *testing.T) {
 	var (
@@ -336,4 +339,12 @@ func TestDeploymentsWrapperFrames(t *testing.T) {
 			t.Errorf("Expected second deployment to have nil creator, got '%s'", *strPtr)
 		}
 	}
+}
+
+func (m *mockDeploymentsClient) ListOrgHookDeliveries(_ context.Context, _ string, _ int64, _ *googlegithub.ListCursorOptions) ([]*googlegithub.HookDelivery, *googlegithub.Response, error) {
+	return nil, nil, nil
+}
+
+func (m *mockDeploymentsClient) ListRepoHookDeliveries(_ context.Context, _, _ string, _ int64, _ *googlegithub.ListCursorOptions) ([]*googlegithub.HookDelivery, *googlegithub.Response, error) {
+	return nil, nil, nil
 }

@@ -315,6 +315,24 @@ func (client *Client) ListDeployments(ctx context.Context, owner, repo string, o
 	return deployments, resp, err
 }
 
+// ListOrgHookDeliveries sends a request to the GitHub rest API to list the deliveries of an organization webhook.
+func (client *Client) ListOrgHookDeliveries(ctx context.Context, org string, hookID int64, opts *googlegithub.ListCursorOptions) ([]*googlegithub.HookDelivery, *googlegithub.Response, error) {
+	deliveries, resp, err := client.restClient.Organizations.ListHookDeliveries(ctx, org, hookID, opts)
+	if err != nil {
+		return nil, nil, addErrorSourceToError(err, resp)
+	}
+	return deliveries, resp, err
+}
+
+// ListRepoHookDeliveries sends a request to the GitHub rest API to list the deliveries of a repository webhook.
+func (client *Client) ListRepoHookDeliveries(ctx context.Context, owner, repo string, hookID int64, opts *googlegithub.ListCursorOptions) ([]*googlegithub.HookDelivery, *googlegithub.Response, error) {
+	deliveries, resp, err := client.restClient.Repositories.ListHookDeliveries(ctx, owner, repo, hookID, opts)
+	if err != nil {
+		return nil, nil, addErrorSourceToError(err, resp)
+	}
+	return deliveries, resp, err
+}
+
 // GetCommitFiles returns the list of files changed in a specific commit.
 // Note: the GitHub API returns at most 300 files for a single commit.
 func (client *Client) GetCommitFiles(ctx context.Context, owner, repo, sha string, opts *googlegithub.ListOptions) ([]*googlegithub.CommitFile, *googlegithub.Response, error) {
@@ -332,6 +350,15 @@ func (client *Client) ListPullRequestFiles(ctx context.Context, owner, repo stri
 		return nil, nil, addErrorSourceToError(err, resp)
 	}
 	return files, resp, nil
+}
+
+// ListCheckRunsForRef sends a request to the GitHub rest API to list the check runs for a git reference.
+func (client *Client) ListCheckRunsForRef(ctx context.Context, owner, repo, ref string, opts *googlegithub.ListCheckRunsOptions) (*googlegithub.ListCheckRunsResults, *googlegithub.Response, error) {
+	results, resp, err := client.restClient.Checks.ListCheckRunsForRef(ctx, owner, repo, ref, opts)
+	if err != nil {
+		return nil, nil, addErrorSourceToError(err, resp)
+	}
+	return results, resp, nil
 }
 
 // GetWorkflowUsage returns the workflow usage for a specific workflow.

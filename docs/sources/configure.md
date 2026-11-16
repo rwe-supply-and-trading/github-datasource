@@ -298,3 +298,7 @@ resource "grafana_data_source" "github" {
   })
 }
 ```
+
+### Workflow job and step results
+
+The Workflow Runs, Workflow Jobs and Workflow Steps queries require repository **Actions: read** for the installation’s selected repositories. See [workflow-results.md](workflow-results.md) for bounded run lists, exact attempts and step-result semantics. Existing App credentials and enterprise API endpoints are reused.

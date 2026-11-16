@@ -46,7 +46,9 @@ const (
 	// QueryTypeWorkflowUsage is used when querying a specific workflow usage
 	QueryTypeWorkflowUsage QueryType = "Workflow_Usage"
 	// QueryTypeWorkflowRuns is used when querying workflow runs for a repository
-	QueryTypeWorkflowRuns QueryType = "Workflow_Runs"
+	QueryTypeWorkflowRuns  QueryType = "Workflow_Runs"
+	QueryTypeWorkflowJobs  QueryType = "Workflow_Jobs"
+	QueryTypeWorkflowSteps QueryType = "Workflow_Steps"
 	// QueryTypeCodeScanning is used when querying code scanning alerts for a repository
 	QueryTypeCodeScanning QueryType = "Code_Scanning"
 	// QueryTypeCodeSearch is used when searching repository contents
@@ -59,6 +61,12 @@ const (
 	QueryTypePullRequestFiles QueryType = "Pull_Request_Files"
 	// QueryTypeBranches is used when querying branches in a GitHub repository
 	QueryTypeBranches QueryType = "Branches"
+	// QueryTypeCheckRuns is used when querying check runs for a git reference in a GitHub repository
+	QueryTypeCheckRuns QueryType = "Check_Runs"
+	// QueryTypePullRequestsForBranches is used when looking up the pull requests opened from a list of branches in a GitHub repository
+	QueryTypePullRequestsForBranches QueryType = "Pull_Requests_For_Branches"
+	// QueryTypeWebhookDeliveries is used when querying deliveries of an organization or repository webhook
+	QueryTypeWebhookDeliveries QueryType = "Webhook_Deliveries"
 )
 
 // Query refers to the structure of a query built using the QueryEditor.
@@ -228,4 +236,28 @@ type PullRequestFilesQuery struct {
 type BranchesQuery struct {
 	Query
 	Options ListBranchesOptions `json:"options"`
+}
+
+// WorkflowJobsQuery addresses jobs within one exact run, or one exact job.
+type WorkflowJobsQuery struct {
+	Query
+	Options WorkflowJobsOptions `json:"options"`
+}
+
+// CheckRunsQuery is used when querying check runs for a git reference in a GitHub repository
+type CheckRunsQuery struct {
+	Query
+	Options CheckRunsOptions `json:"options"`
+}
+
+// PullRequestsForBranchesQuery is used when looking up the pull requests opened from a list of branches
+type PullRequestsForBranchesQuery struct {
+	Query
+	Options ListPullRequestsForBranchesOptions `json:"options"`
+}
+
+// WebhookDeliveriesQuery is used when querying for deliveries of a GitHub webhook
+type WebhookDeliveriesQuery struct {
+	Query
+	Options ListWebhookDeliveriesOptions `json:"options"`
 }
