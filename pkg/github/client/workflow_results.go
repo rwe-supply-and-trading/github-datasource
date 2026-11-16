@@ -42,7 +42,7 @@ func (c *Client) GetWorkflowRunResults(ctx context.Context, opt models.WorkflowR
 			rows, resp, err = c.restClient.Actions.ListWorkflowRunsByFileName(ctx, opt.Owner, opt.Repository, opt.Workflow, opts)
 		}
 		if err != nil {
-			return nil, false, fmt.Errorf("listing workflow runs: %w", err)
+			return nil, false, addErrorSourceToError(fmt.Errorf("listing workflow runs: %w", err), resp)
 		}
 		if rows == nil {
 			return nil, false, fmt.Errorf("GitHub returned no workflow-run response")
@@ -58,9 +58,9 @@ func (c *Client) GetWorkflowRunResults(ctx context.Context, opt models.WorkflowR
 	return out, true, nil
 }
 func (c *Client) GetWorkflowJobResult(ctx context.Context, owner, repo string, id int64) (*gh.WorkflowJob, error) {
-	j, _, err := c.restClient.Actions.GetWorkflowJobByID(ctx, owner, repo, id)
+	j, resp, err := c.restClient.Actions.GetWorkflowJobByID(ctx, owner, repo, id)
 	if err != nil {
-		return nil, fmt.Errorf("getting workflow job: %w", err)
+		return nil, addErrorSourceToError(fmt.Errorf("getting workflow job: %w", err), resp)
 	}
 	if j == nil {
 		return nil, fmt.Errorf("GitHub returned no job response")
@@ -82,7 +82,7 @@ func (c *Client) GetWorkflowJobResults(ctx context.Context, owner, repo string, 
 			rows, resp, err = c.restClient.Actions.ListWorkflowJobs(ctx, owner, repo, run, &gh.ListWorkflowJobsOptions{ListOptions: *opts, Filter: "latest"})
 		}
 		if err != nil {
-			return nil, false, fmt.Errorf("listing workflow jobs: %w", err)
+			return nil, false, addErrorSourceToError(fmt.Errorf("listing workflow jobs: %w", err), resp)
 		}
 		if rows == nil {
 			return nil, false, fmt.Errorf("GitHub returned no workflow-job response")
