@@ -1,5 +1,17 @@
 # Change Log
 
+## 2.11.0-rwe.1
+
+- Keep ambiguous local Action checkout contexts unresolved and compare multi-select governance properties independently of ordering.
+- Guard absent embedded REST responses and report invalid failure-limit inputs in the query editor.
+- Add shared repository-governance snapshots with ownership counts, explicit review findings and bounded selected-repository source inspection.
+- Correct query-editor state handling, repository/attempt controls and formatting; retain safe rate-limit detection after error sanitization.
+- Reject cancelled cache results and show partial-inventory warnings in commit comparison as well as reference views.
+- Add exact workflow-run/attempt queries, genuine attempt choices, failure-first job selection and numbered failed-step summaries.
+- Add bounded cross-repository failure discovery with explicit coverage and no per-run job fan-out.
+- Add full-SHA Action inventory from workflow YAML, reachable composite/reusable definitions and explicit scan boundaries.
+- Reuse matching interactive query results through a bounded instance-local cache; preserve SDK-safe REST error classification and run/job identity guards.
+
 ## 2.10.0-rwe.1
 
 - Align the private fork with upstream main at 6f39c64, including Check Runs, Pull Requests for Branches, Webhook Deliveries, dependency/security fixes, and the multi-variable whitespace fix.
@@ -41,7 +53,6 @@
 
 ⚙️ Chore: Updated backend dependencies.
 ⚙️ Chore: Publish data source configuration schemas for provisioning and automation.
-
 
 ## 2.9.2-rwe.2
 

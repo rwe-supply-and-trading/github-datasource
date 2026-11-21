@@ -1,21 +1,29 @@
 import { type DataQuery } from '@grafana/schema';
-import { PullRequestTimeField, IssueTimeField, WorkflowsTimeField, PackageType, ProjectQueryType, QueryTypes, WebhookDeliveryStatus } from '../constants';
+import {
+  PullRequestTimeField,
+  IssueTimeField,
+  WorkflowsTimeField,
+  PackageType,
+  ProjectQueryType,
+  QueryTypes,
+  WebhookDeliveryStatus,
+} from '../constants';
 import type { Filter } from 'components/Filters';
 
-export type QueryType = typeof QueryTypes[number]
+export type QueryType = (typeof QueryTypes)[number];
 
-export type Options = { [index: string]: any; }
+export type Options = { [index: string]: any };
 
-export type RepositoryOptions = { repository?: string; owner?: string; }
+export type RepositoryOptions = { repository?: string; owner?: string };
 
-type BaseQuery<T extends QueryType, O extends Options> = { queryType: T; options?: O; } & RepositoryOptions & DataQuery;
+type BaseQuery<T extends QueryType, O extends Options> = { queryType: T; options?: O } & RepositoryOptions & DataQuery;
 
 //#region Code_Scanning Query
 export type CodeScanningOptions = Options & {
   gitRef?: string;
-  state?: string
-}
-type Code_ScanningQuery = BaseQuery<'Code_Scanning', CodeScanningOptions>
+  state?: string;
+};
+type Code_ScanningQuery = BaseQuery<'Code_Scanning', CodeScanningOptions>;
 //#endregion
 
 //#region Code Search Query
@@ -24,133 +32,133 @@ export type CodeSearchOptions = Options & {
   exactPath?: string;
   includeTextMatches?: boolean;
   requireComplete?: boolean;
-}
-type Code_SearchQuery = BaseQuery<'Code_Search', CodeSearchOptions>
+};
+type Code_SearchQuery = BaseQuery<'Code_Search', CodeSearchOptions>;
 //#endregion
 
 //#region Commits Query
 export type CommitsOptions = Options & {
   gitRef?: string;
-}
-type CommitsQuery = BaseQuery<'Commits', CommitsOptions>
+};
+type CommitsQuery = BaseQuery<'Commits', CommitsOptions>;
 //#endregion
 
 //#region Commit_Files Query
 export type CommitFilesOptions = Options & {
   commitSha?: string;
-}
-type Commit_FilesQuery = BaseQuery<'Commit_Files', CommitFilesOptions>
+};
+type Commit_FilesQuery = BaseQuery<'Commit_Files', CommitFilesOptions>;
 //#endregion
 
 //#region Issues Query
 export type IssuesOptions = Options & {
   timeField?: IssueTimeField;
   query?: string;
-}
-type IssuesQuery = BaseQuery<'Issues', IssuesOptions>
+};
+type IssuesQuery = BaseQuery<'Issues', IssuesOptions>;
 //#endregion
 
 //#region Contributors Query
 export type ContributorsOptions = Options & {
   query?: string;
-}
-type ContributorsQuery = BaseQuery<'Contributors', ContributorsOptions>
+};
+type ContributorsQuery = BaseQuery<'Contributors', ContributorsOptions>;
 //#endregion
 
 //#region Tags Query
-export type TagsOptions = Options & {}
-type TagsQuery = BaseQuery<'Tags', TagsOptions>
+export type TagsOptions = Options & {};
+type TagsQuery = BaseQuery<'Tags', TagsOptions>;
 //#endregion
 
 //#region Branches Query
 export type BranchesOptions = Options & {
   query?: string;
-}
-type BranchesQuery = BaseQuery<'Branches', BranchesOptions>
+};
+type BranchesQuery = BaseQuery<'Branches', BranchesOptions>;
 //#endregion
 
 //#region Releases Query
-export type ReleasesOptions = Options & {}
-type ReleasesQuery = BaseQuery<'Releases', ReleasesOptions>
+export type ReleasesOptions = Options & {};
+type ReleasesQuery = BaseQuery<'Releases', ReleasesOptions>;
 //#endregion
 
 //#region Pull_Requests Query
 export type Pull_RequestsOptions = Options & {
   timeField?: PullRequestTimeField;
   query?: string;
-}
-type Pull_RequestsQuery = BaseQuery<'Pull_Requests', Pull_RequestsOptions>
+};
+type Pull_RequestsQuery = BaseQuery<'Pull_Requests', Pull_RequestsOptions>;
 //#endregion
 
 //#region Pull_Requests_For_Branches Query
 export type Pull_Requests_For_BranchesOptions = Options & {
   branches?: string[];
-}
-type Pull_Requests_For_BranchesQuery = BaseQuery<'Pull_Requests_For_Branches', Pull_Requests_For_BranchesOptions>
+};
+type Pull_Requests_For_BranchesQuery = BaseQuery<'Pull_Requests_For_Branches', Pull_Requests_For_BranchesOptions>;
 //#endregion
 
 //#region Pull_Request_Files Query
 export type Pull_Request_FilesOption = Options & {
   prNumber?: number;
-}
-type Pull_Request_FilesQuery = BaseQuery<'Pull_Request_Files', Pull_Request_FilesOption>
+};
+type Pull_Request_FilesQuery = BaseQuery<'Pull_Request_Files', Pull_Request_FilesOption>;
 //#endregion
 
 //#region Pull_Request_Reviews Query
 export type PullRequestReviewsOptions = Options & {
   timeField?: PullRequestTimeField;
   query?: string;
-}
-type Pull_Request_ReviewsQuery = BaseQuery<'Pull_Request_Reviews', PullRequestReviewsOptions>
+};
+type Pull_Request_ReviewsQuery = BaseQuery<'Pull_Request_Reviews', PullRequestReviewsOptions>;
 //#endregion
 
 //#region Labels Query
 export type LabelsOptions = Options & {
   query?: string;
-}
-type LabelsQuery = BaseQuery<'Labels', LabelsOptions>
+};
+type LabelsQuery = BaseQuery<'Labels', LabelsOptions>;
 //#endregion
 
 //#region Repositories Query
 export type RepositoriesOptions = Options & {
   propertyName?: string;
   propertyValue?: string;
-}
-type RepositoriesQuery = BaseQuery<'Repositories', RepositoriesOptions>
+};
+type RepositoriesQuery = BaseQuery<'Repositories', RepositoriesOptions>;
 //#endregion
 
 //#region Organization Custom Properties Query
 export type CustomPropertiesOptions = Options & {
   propertyName?: string;
-}
-type CustomPropertiesQuery = BaseQuery<'CustomProperties', CustomPropertiesOptions>
+};
+type CustomPropertiesQuery = BaseQuery<'CustomProperties', CustomPropertiesOptions>;
 //#endregion
 
 //#region Organizations Query
-type OrganizationsQuery = BaseQuery<'Organizations', {}>
+type OrganizationsQuery = BaseQuery<'Organizations', {}>;
 //#endregion
 
 //#region GraphQL Query
-type GraphQLQuery = BaseQuery<'GraphQL', {}>
+type GraphQLQuery = BaseQuery<'GraphQL', {}>;
 //#endregion
 
 //#region Milestones Query
 export type MilestonesOptions = Options & {
   query?: string;
-}
-type MilestonesQuery = BaseQuery<'Milestones', MilestonesOptions>
+};
+type MilestonesQuery = BaseQuery<'Milestones', MilestonesOptions>;
 //#endregion
 
 //#region Packages Query
 export type PackagesOptions = Options & {
   names?: string;
   packageType?: PackageType;
-}
-type PackagesQuery = BaseQuery<'Packages', PackagesOptions>
+};
+type PackagesQuery = BaseQuery<'Packages', PackagesOptions>;
 //#endregion
 
 //#region Vulnerabilities Query
-type VulnerabilitiesQuery = BaseQuery<'Vulnerabilities', {}>
+type VulnerabilitiesQuery = BaseQuery<'Vulnerabilities', {}>;
 //#endregion
 
 //#region Projects Query
@@ -160,16 +168,16 @@ export type ProjectsOptions = Options & {
   user?: string;
   kind?: ProjectQueryType;
   filters?: Filter[];
-}
-type ProjectsQuery = BaseQuery<'Projects', ProjectsOptions>
+};
+type ProjectsQuery = BaseQuery<'Projects', ProjectsOptions>;
 //#endregion
 
 //#region ProjectItems Query
-type ProjectItemsQuery = BaseQuery<'ProjectItems', {}>
+type ProjectItemsQuery = BaseQuery<'ProjectItems', {}>;
 //#endregion
 
 //#region Stargazers Query
-type StargazersQuery = BaseQuery<'Stargazers', {}>
+type StargazersQuery = BaseQuery<'Stargazers', {}>;
 //#endregion
 
 //#region Workflow_Runs Query
@@ -178,26 +186,54 @@ export type WorkflowRunsOptions = Options & {
   maxRuns?: number;
   workflowID?: string;
   branch?: string;
-}
-type Workflow_RunsQuery = BaseQuery<'Workflow_Runs', WorkflowRunsOptions>
-export type WorkflowJobsOptions = Options & { runId?: string; jobId?: string; attempt?: string; }
-type Workflow_JobsQuery = BaseQuery<'Workflow_Jobs', WorkflowJobsOptions>
-type Workflow_StepsQuery = BaseQuery<'Workflow_Steps', WorkflowJobsOptions>
+};
+type Workflow_RunsQuery = BaseQuery<'Workflow_Runs', WorkflowRunsOptions>;
+export type WorkflowJobsOptions = Options & {
+  runId?: string;
+  jobId?: string;
+  attempt?: string;
+  failureFirst?: boolean;
+};
+export type WorkflowRunOptions = Options & { runId?: string; attempt?: string };
+export type WorkflowFailuresOptions = Options & {
+  repositories?: string[];
+  branch?: string;
+  maxRuns?: number;
+  view?: string;
+};
+export type ActionInventoryOptions = Options & {
+  repositories?: string[];
+  ref?: string;
+  view?: string;
+  resolveDependencies?: boolean;
+};
+type Workflow_RunQuery = BaseQuery<'Workflow_Run', WorkflowRunOptions>;
+type Workflow_AttemptsQuery = BaseQuery<'Workflow_Attempts', WorkflowRunOptions>;
+type Workflow_FailuresQuery = BaseQuery<'Workflow_Failures', WorkflowFailuresOptions>;
+type Action_InventoryQuery = BaseQuery<'Action_Inventory', ActionInventoryOptions>;
+export type RepositoryGovernanceOptions = Options & {
+  view?: 'ownership' | 'repositories' | 'details';
+  ownership?: string;
+};
+type Repository_GovernanceQuery = BaseQuery<'Repository_Governance', RepositoryGovernanceOptions>;
+type Workflow_JobsQuery = BaseQuery<'Workflow_Jobs', WorkflowJobsOptions>;
+type Workflow_StepsQuery = BaseQuery<'Workflow_Steps', WorkflowJobsOptions>;
 //#endregion
 
 //#region Workflow_Usage Query
 export type WorkflowUsageOptions = Options & {
   workflowID?: number;
-}
-type Workflow_UsageQuery = BaseQuery<'Workflow_Usage', WorkflowUsageOptions>
+};
+type Workflow_UsageQuery = BaseQuery<'Workflow_Usage', WorkflowUsageOptions>;
 //#endregion
 
 //#region Workflows Query
 export type WorkflowsOptions = Options & {
   timeField?: WorkflowsTimeField;
+  includeAll?: boolean;
   query?: string;
-}
-type WorkflowsQuery = BaseQuery<'Workflows', WorkflowsOptions>
+};
+type WorkflowsQuery = BaseQuery<'Workflows', WorkflowsOptions>;
 //#endregion
 
 //#region Deployments Query
@@ -206,8 +242,8 @@ export type DeploymentsOptions = Options & {
   gitRef?: string;
   task?: string;
   environment?: string;
-}
-type DeploymentsQuery = BaseQuery<'Deployments', DeploymentsOptions>
+};
+type DeploymentsQuery = BaseQuery<'Deployments', DeploymentsOptions>;
 //#endregion
 
 //#region Check_Runs Query
@@ -216,8 +252,8 @@ export type CheckRunsOptions = Options & {
   checkName?: string;
   status?: string;
   filter?: string;
-}
-type Check_RunsQuery = BaseQuery<'Check_Runs', CheckRunsOptions>
+};
+type Check_RunsQuery = BaseQuery<'Check_Runs', CheckRunsOptions>;
 //#endregion
 
 //#region Webhook_Deliveries Query
@@ -225,44 +261,49 @@ export type WebhookDeliveriesOptions = Options & {
   hookId?: string;
   event?: string;
   status?: WebhookDeliveryStatus;
-}
-type Webhook_DeliveriesQuery = BaseQuery<'Webhook_Deliveries', WebhookDeliveriesOptions>
+};
+type Webhook_DeliveriesQuery = BaseQuery<'Webhook_Deliveries', WebhookDeliveriesOptions>;
 //#endregion
 
 export type GitHubQuery =
-  Check_RunsQuery |
-  Code_ScanningQuery |
-  Code_SearchQuery |
-  CommitsQuery |
-  Commit_FilesQuery |
-  IssuesQuery |
-  ContributorsQuery |
-  TagsQuery |
-  ReleasesQuery |
-  Pull_RequestsQuery |
-  Pull_Requests_For_BranchesQuery |
-  Pull_Request_ReviewsQuery |
-  Pull_Request_FilesQuery |
-  LabelsQuery |
-  RepositoriesQuery |
-  CustomPropertiesQuery |
-  OrganizationsQuery |
-  GraphQLQuery |
-  MilestonesQuery |
-  PackagesQuery |
-  VulnerabilitiesQuery |
-  ProjectsQuery |
-  ProjectItemsQuery |
-  StargazersQuery |
-  Workflow_RunsQuery |
-  Workflow_JobsQuery |
-  Workflow_StepsQuery |
-  Workflow_UsageQuery |
-  WorkflowsQuery |
-  DeploymentsQuery |
-  BranchesQuery |
-  Webhook_DeliveriesQuery
+  | Check_RunsQuery
+  | Code_ScanningQuery
+  | Code_SearchQuery
+  | CommitsQuery
+  | Commit_FilesQuery
+  | IssuesQuery
+  | ContributorsQuery
+  | TagsQuery
+  | ReleasesQuery
+  | Pull_RequestsQuery
+  | Pull_Requests_For_BranchesQuery
+  | Pull_Request_ReviewsQuery
+  | Pull_Request_FilesQuery
+  | LabelsQuery
+  | RepositoriesQuery
+  | CustomPropertiesQuery
+  | OrganizationsQuery
+  | GraphQLQuery
+  | MilestonesQuery
+  | PackagesQuery
+  | VulnerabilitiesQuery
+  | ProjectsQuery
+  | ProjectItemsQuery
+  | StargazersQuery
+  | Workflow_RunsQuery
+  | Workflow_JobsQuery
+  | Workflow_StepsQuery
+  | Workflow_RunQuery
+  | Workflow_AttemptsQuery
+  | Workflow_FailuresQuery
+  | Action_InventoryQuery
+  | Repository_GovernanceQuery
+  | Workflow_UsageQuery
+  | WorkflowsQuery
+  | DeploymentsQuery
+  | BranchesQuery
+  | Webhook_DeliveriesQuery;
 
-export type GitHubVariableQuery = { key?: string; field?: string; } & GitHubQuery
+export type GitHubVariableQuery = { key?: string; field?: string } & GitHubQuery;
 
-export type GitHubAnnotationQuery = { timeField?: string; } & GitHubVariableQuery
+export type GitHubAnnotationQuery = { timeField?: string } & GitHubVariableQuery;

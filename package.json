@@ -1,6 +1,6 @@
 {
   "name": "rwe-github-datasource",
-  "version": "2.10.0-rwe.1",
+  "version": "2.11.0-rwe.1",
   "private": true,
   "description": "Grafana data source plugin for Github",
   "repository": "github:rwe-supply-and-trading/github-datasource",

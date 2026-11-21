@@ -4,47 +4,56 @@ import type { GitHubQuery } from './types/query';
 
 export const isValid = (query: GitHubQuery): boolean => {
   if (
-    query.queryType === "Repositories" ||
-    query.queryType === "CustomProperties" ||
-    query.queryType === "Code_Scanning"
+    query.queryType === 'Repositories' ||
+    query.queryType === 'CustomProperties' ||
+    query.queryType === 'Repository_Governance' ||
+    query.queryType === 'Code_Scanning'
   ) {
     if (isEmpty(query.owner)) {
       return false;
     }
   }
-  if (query.queryType === "Code_Search" && isEmpty(query.options?.query)) {
+  if (query.queryType === 'Workflow_Failures' || query.queryType === 'Action_Inventory') {
+    if (isEmpty(query.owner) || (isEmpty(query.repository) && isEmpty(query.options?.repositories))) {
+      return false;
+    }
+  }
+  if (query.queryType === 'Code_Search' && isEmpty(query.options?.query)) {
     return false;
   }
   if (
-    query.queryType === "Workflow_Runs" ||
-    query.queryType === "Workflow_Jobs" ||
-    query.queryType === "Workflow_Steps" ||
-    query.queryType === "Commits" ||
+    query.queryType === 'Workflow_Run' ||
+    query.queryType === 'Workflow_Attempts' ||
+    query.queryType === 'Workflows' ||
+    query.queryType === 'Workflow_Runs' ||
+    query.queryType === 'Workflow_Jobs' ||
+    query.queryType === 'Workflow_Steps' ||
+    query.queryType === 'Commits' ||
     query.queryType === 'Commit_Files' ||
     query.queryType === 'Check_Runs' ||
-    query.queryType === "Contributors" ||
-    query.queryType === "Tags" ||
-    query.queryType === "Releases" ||
-    query.queryType === "Labels" ||
-    query.queryType === "Milestones" ||
-    query.queryType === "Vulnerabilities" ||
-    query.queryType === "Pull_Request_Files" ||
-    query.queryType === "Pull_Requests_For_Branches" ||
-    query.queryType === "Stargazers"
+    query.queryType === 'Contributors' ||
+    query.queryType === 'Tags' ||
+    query.queryType === 'Releases' ||
+    query.queryType === 'Labels' ||
+    query.queryType === 'Milestones' ||
+    query.queryType === 'Vulnerabilities' ||
+    query.queryType === 'Pull_Request_Files' ||
+    query.queryType === 'Pull_Requests_For_Branches' ||
+    query.queryType === 'Stargazers'
   ) {
     if (isEmpty(query.owner) || isEmpty(query.repository)) {
       return false;
     }
   }
-  if (query.queryType === "Pull_Requests_For_Branches" && isEmpty(query.options?.branches)) {
+  if (query.queryType === 'Pull_Requests_For_Branches' && isEmpty(query.options?.branches)) {
     return false;
   }
-  if (query.queryType === "Webhook_Deliveries") {
+  if (query.queryType === 'Webhook_Deliveries') {
     if (isEmpty(query.owner) || isEmpty(query.options?.hookId)) {
       return false;
     }
   }
-  if (query.queryType === "Projects") {
+  if (query.queryType === 'Projects') {
     if (isEmpty(query.options?.user) && query.options?.kind === ProjectQueryType.USER) {
       return false;
     }

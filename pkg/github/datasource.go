@@ -21,7 +21,8 @@ var (
 
 // Datasource handles requests to GitHub
 type Datasource struct {
-	client *githubclient.Client
+	client      *githubclient.Client
+	actionCache *actionQueryCache
 }
 
 // HandleRepositoriesQuery is the query handler for listing GitHub Repositories
@@ -244,7 +245,13 @@ func (d *Datasource) HandleWorkflowsQuery(ctx context.Context, query *models.Wor
 		TimeField:  query.Options.TimeField,
 	}
 
-	return GetWorkflows(ctx, d.client, opt, req.TimeRange)
+	return d.cachedActionQuery(ctx, []any{"workflows", opt, query.Options.IncludeAll, req.TimeRange.From.Unix(), req.TimeRange.To.Unix()}, func() (dfutil.Framer, error) {
+		rows, err := GetWorkflows(ctx, d.client, opt, req.TimeRange)
+		if err != nil {
+			return nil, err
+		}
+		return workflowChoicesResult{rows: rows, includeAll: query.Options.IncludeAll}, nil
+	})
 }
 
 // HandleWorkflowUsageQuery is the query handler for getting the usage information of a specific workflow
@@ -260,20 +267,16 @@ func (d *Datasource) HandleWorkflowUsageQuery(ctx context.Context, query *models
 
 // HandleWorkflowRunsQuery is the query handler for listing workflow runs of a GitHub repository
 func (d *Datasource) HandleWorkflowRunsQuery(ctx context.Context, query *models.WorkflowRunsQuery, req backend.DataQuery) (dfutil.Framer, error) {
-	opt := models.WorkflowRunsOptions{
-		Repository: query.Repository,
-		Owner:      query.Owner,
-		Workflow:   query.Options.Workflow,
-		Branch:     query.Options.Branch,
-	}
-
-	opt.Status = query.Options.Status
-	opt.MaxRuns = query.Options.MaxRuns
-	runs, limited, err := d.client.GetWorkflowRunResults(ctx, opt, req.TimeRange)
-	if err != nil {
-		return nil, err
-	}
-	return workflowRunResults{runs: WorkflowRunsWrapper(runs), limited: limited}, nil
+	opt := query.Options
+	opt.Owner = query.Owner
+	opt.Repository = query.Repository
+	return d.cachedActionQuery(ctx, []any{"runs", opt, req.TimeRange.From.Unix(), req.TimeRange.To.Unix()}, func() (dfutil.Framer, error) {
+		rows, limited, err := d.client.GetWorkflowRunResults(ctx, opt, req.TimeRange)
+		if err != nil {
+			return nil, err
+		}
+		return workflowRunResults{runs: WorkflowRunsWrapper(rows), limited: limited}, nil
+	})
 }
 
 // HandleDeploymentsQuery is the query handler for listing GitHub Deployments
@@ -336,7 +339,7 @@ func NewDatasource(ctx context.Context, settings models.Settings) (*Datasource, 
 	if err != nil {
 		return nil, err
 	}
-	return &Datasource{client: client}, nil
+	return &Datasource{client: client, actionCache: &actionQueryCache{}}, nil
 }
 
 func newHealthResult(status backend.HealthStatus, message string) (*backend.CheckHealthResult, error) {

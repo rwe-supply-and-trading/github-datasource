@@ -64,7 +64,11 @@ func getCodeSearch(ctx context.Context, client codeSearchClient, query, exactPat
 	}
 	search := CodeSearch{Complete: true}
 	rawResultCount := 0
-	for page := 1; page != 0; {
+	for page, pages := 1, 0; page != 0; pages++ {
+		if pages >= 10 {
+			search.Complete = false
+			break
+		}
 		result, response, err := client.SearchCode(ctx, query, &googlegithub.SearchOptions{
 			TextMatch:   includeTextMatches,
 			ListOptions: googlegithub.ListOptions{Page: page, PerPage: 100},
@@ -82,6 +86,10 @@ func getCodeSearch(ctx context.Context, client codeSearchClient, query, exactPat
 			if exactPath == "" || item.GetPath() == exactPath {
 				search.Items = append(search.Items, item)
 			}
+		}
+		if response == nil {
+			search.Complete = false
+			break
 		}
 		page = response.NextPage
 	}

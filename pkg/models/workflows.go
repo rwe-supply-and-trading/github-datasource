@@ -23,7 +23,8 @@ type ListWorkflowsOptions struct {
 	Repository string `json:"repository"`
 
 	// The field used to check if an entry is in the requested range.
-	TimeField WorkflowTimeField `json:"timeField"`
+	TimeField  WorkflowTimeField `json:"timeField"`
+	IncludeAll bool              `json:"includeAll"`
 }
 
 // WorkflowUsageOptions is provided when fetching a specific workflow usage
@@ -51,9 +52,10 @@ type WorkflowRunsOptions struct {
 }
 
 type WorkflowJobsOptions struct {
-	RunID   string `json:"runId"`
-	JobID   string `json:"jobId"`
-	Attempt string `json:"attempt"`
+	RunID        string `json:"runId"`
+	JobID        string `json:"jobId"`
+	Attempt      string `json:"attempt"`
+	FailureFirst bool   `json:"failureFirst"`
 }
 
 // WorkflowUsage contains a specific workflow usage information.

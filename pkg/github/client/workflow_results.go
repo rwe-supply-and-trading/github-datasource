@@ -3,17 +3,21 @@ package githubclient
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"time"
+
 	gh "github.com/google/go-github/v84/github"
 	"github.com/grafana/github-datasource/pkg/models"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"strconv"
-	"time"
 )
 
 // GetWorkflowRunResults bounds interactive work to one repository and at most 1000 runs.
 func (c *Client) GetWorkflowRunResults(ctx context.Context, opt models.WorkflowRunsOptions, tr backend.TimeRange) ([]*gh.WorkflowRun, bool, error) {
 	if opt.Owner == "" || opt.Repository == "" {
 		return nil, false, nil
+	}
+	if opt.Workflow == "__all__" {
+		opt.Workflow = ""
 	}
 	limit := opt.MaxRuns
 	if limit == 0 {
@@ -57,6 +61,7 @@ func (c *Client) GetWorkflowRunResults(ctx context.Context, opt models.WorkflowR
 	}
 	return out, true, nil
 }
+
 func (c *Client) GetWorkflowJobResult(ctx context.Context, owner, repo string, id int64) (*gh.WorkflowJob, error) {
 	j, resp, err := c.restClient.Actions.GetWorkflowJobByID(ctx, owner, repo, id)
 	if err != nil {

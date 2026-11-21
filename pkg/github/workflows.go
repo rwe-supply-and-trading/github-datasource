@@ -28,6 +28,7 @@ func (workflows WorkflowsWrapper) Frames() data.Frames {
 		data.NewField("url", nil, []*string{}),
 		data.NewField("html_url", nil, []*string{}),
 		data.NewField("badge_url", nil, []*string{}),
+		data.NewField("key", nil, []string{}),
 	)
 
 	for _, workflow := range workflows {
@@ -42,6 +43,7 @@ func (workflows WorkflowsWrapper) Frames() data.Frames {
 			workflow.URL,
 			workflow.HTMLURL,
 			workflow.BadgeURL,
+			fmt.Sprintf("%d", workflow.GetID()),
 		)
 	}
 
@@ -58,18 +60,31 @@ func GetWorkflows(ctx context.Context, client models.Client, opts models.ListWor
 	// Fetch this many workflows per page because this API endpoint does not allow filtering by time.
 	// 100 is the maximum number of workflows that can be retrieved per request as specified in the GitHub API documentation.
 	// Also, it's unlikely a repository will have more workflows than this.
-	data, _, err := client.ListWorkflows(ctx, opts.Owner, opts.Repository, &googlegithub.ListOptions{Page: 1, PerPage: 100})
-	if err != nil {
-		return nil, fmt.Errorf("listing workflows: opts=%+v: %v", opts, err)
+	workflows := WorkflowsWrapper{}
+	for page := 1; page <= 10; page++ {
+		result, resp, err := client.ListWorkflows(ctx, opts.Owner, opts.Repository, &googlegithub.ListOptions{Page: page, PerPage: 100})
+		if err != nil {
+			return nil, fmt.Errorf("listing workflows: %w", err)
+		}
+		if result == nil {
+			return nil, fmt.Errorf("GitHub returned no workflow catalogue")
+		}
+		workflows = append(workflows, result.Workflows...)
+		if resp == nil || resp.NextPage == 0 {
+			break
+		}
+		if page == 10 {
+			return nil, fmt.Errorf("workflow catalogue exceeds 1000 entries")
+		}
 	}
 
 	// If time field is None, return all workflows without filtering
 	if opts.TimeField == models.WorkflowTimeFieldNone {
-		return WorkflowsWrapper(data.Workflows), nil
+		return workflows, nil
 	}
 
 	// Otherwise, apply time filtering based on the selected time field
-	workflows, err := keepWorkflowsInTimeRange(data.Workflows, opts.TimeField, timeRange)
+	workflows, err := keepWorkflowsInTimeRange(workflows, opts.TimeField, timeRange)
 	if err != nil {
 		return nil, fmt.Errorf("filtering workflows by time range: timeField=%d timeRange=%+v: %v", opts.TimeField, timeRange, err)
 	}
@@ -242,13 +257,18 @@ func (workflowRuns WorkflowRunsWrapper) Frames() data.Frames {
 		data.NewField("workflow_id", nil, []*int64{}),
 		data.NewField("run_number", nil, []int64{}),
 		data.NewField("run_attempt", nil, []int64{}),
+		data.NewField("commit_url", nil, []string{}),
 	)
 
 	for _, workflowRun := range workflowRuns {
+		commitURL := ""
+		if workflowRun.GetRepository() != nil {
+			commitURL = workflowRun.GetRepository().GetHTMLURL() + "/commit/" + workflowRun.GetHeadSHA()
+		}
 		frame.AppendRow(
 			workflowRun.ID,
 			workflowRun.Name,
-			fmt.Sprintf("%s #%d · attempt %d", workflowRun.GetName(), workflowRun.GetRunNumber(), workflowRun.GetRunAttempt()),
+			fmt.Sprintf("%s #%d", workflowRun.GetName(), workflowRun.GetRunNumber()),
 			workflowRun.HeadBranch,
 			workflowRun.HeadSHA,
 			workflowRun.CreatedAt.GetTime(),
@@ -263,6 +283,7 @@ func (workflowRuns WorkflowRunsWrapper) Frames() data.Frames {
 			workflowRun.WorkflowID,
 			int64(workflowRun.GetRunNumber()),
 			int64(workflowRun.GetRunAttempt()),
+			commitURL,
 		)
 	}
 
@@ -282,4 +303,20 @@ func GetWorkflowRuns(ctx context.Context, client models.Client, opts models.Work
 	}
 
 	return WorkflowRunsWrapper(workflowRuns), nil
+}
+
+// Catalogue frames are rebuilt per caller so variable and panel RefIDs cannot
+// mutate a shared cached frame.
+type workflowChoicesResult struct {
+	rows       WorkflowsWrapper
+	includeAll bool
+}
+
+func (r workflowChoicesResult) Frames() data.Frames {
+	frames := r.rows.Frames()
+	if r.includeAll {
+		name := "All workflows"
+		frames[0].InsertRow(0, nil, &name, nil, nil, nil, nil, nil, nil, nil, "__all__")
+	}
+	return frames
 }

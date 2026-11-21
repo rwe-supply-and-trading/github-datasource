@@ -21,9 +21,11 @@ import { QueryEditorLabels } from './QueryEditorLabels';
 import { QueryEditorPackages } from './QueryEditorPackages';
 import { QueryEditorProjects } from './QueryEditorProjects';
 import { QueryEditorWorkflows } from './QueryEditorWorkflows';
+import { QueryEditorRepositoryGovernance } from './QueryEditorRepositoryGovernance';
 import { QueryEditorWorkflowUsage } from './QueryEditorWorkflowUsage';
 import { QueryEditorWorkflowRuns } from './QueryEditorWorkflowRuns';
 import { QueryEditorWorkflowJobs } from './QueryEditorWorkflowJobs';
+import { QueryEditorWorkflowRun, QueryEditorWorkflowFailures, QueryEditorActionInventory } from './QueryEditorAction';
 import { QueryEditorCodeScanning } from './QueryEditorCodeScanning';
 import { QueryEditorCheckRuns } from './QueryEditorCheckRuns';
 import { QueryEditorDeployments } from './QueryEditorDeployments';
@@ -142,6 +144,11 @@ const queryEditors: Record<QueryType, { component: (props: Props, onChange: (val
       <QueryEditorProjects {...(props.query.options || {})} onChange={onChange} />
     ),
   },
+  ['Repository_Governance']: {
+    component: (props: Props, onChange: (value: any) => void) => (
+      <QueryEditorRepositoryGovernance options={props.query.options || {}} onChange={onChange} />
+    ),
+  },
   ['Workflows']: {
     component: (props: Props, onChange: (val: any) => void) => (
       <QueryEditorWorkflows {...(props.query.options || {})} onChange={onChange} />
@@ -152,8 +159,36 @@ const queryEditors: Record<QueryType, { component: (props: Props, onChange: (val
       <QueryEditorWorkflowUsage {...(props.query.options || {})} onChange={onChange} />
     ),
   },
-  ['Workflow_Jobs']: { component: (props: Props, onChange: (val: any) => void) => <QueryEditorWorkflowJobs {...(props.query.options || {})} onChange={onChange} /> },
-  ['Workflow_Steps']: { component: (props: Props, onChange: (val: any) => void) => <QueryEditorWorkflowJobs {...(props.query.options || {})} onChange={onChange} /> },
+  ['Workflow_Run']: {
+    component: (props: Props, onChange: (val: any) => void) => (
+      <QueryEditorWorkflowRun options={props.query.options || {}} onChange={onChange} />
+    ),
+  },
+  ['Workflow_Attempts']: {
+    component: (props: Props, onChange: (val: any) => void) => (
+      <QueryEditorWorkflowRun options={props.query.options || {}} attemptsOnly onChange={onChange} />
+    ),
+  },
+  ['Workflow_Failures']: {
+    component: (props: Props, onChange: (val: any) => void) => (
+      <QueryEditorWorkflowFailures options={props.query.options || {}} onChange={onChange} />
+    ),
+  },
+  ['Action_Inventory']: {
+    component: (props: Props, onChange: (val: any) => void) => (
+      <QueryEditorActionInventory options={props.query.options || {}} onChange={onChange} />
+    ),
+  },
+  ['Workflow_Jobs']: {
+    component: (props: Props, onChange: (val: any) => void) => (
+      <QueryEditorWorkflowJobs options={props.query.options || {}} onChange={onChange} />
+    ),
+  },
+  ['Workflow_Steps']: {
+    component: (props: Props, onChange: (val: any) => void) => (
+      <QueryEditorWorkflowJobs options={props.query.options || {}} stepsOnly onChange={onChange} />
+    ),
+  },
   ['Workflow_Runs']: {
     component: (props: Props, onChange: (val: any) => void) => (
       <QueryEditorWorkflowRuns {...(props.query.options || {})} onChange={onChange} />
@@ -236,7 +271,8 @@ const QueryEditor = (props: Props) => {
               }}
             />
           )}
-          {hasRepository(props.query.queryType) && (
+          {(hasRepository(props.query.queryType) ||
+            (props.query.queryType === 'Repository_Governance' && props.query.options?.view === 'details')) && (
             <QueryEditorRepository
               repository={props.query.repository}
               onChange={(repo) => {
@@ -259,7 +295,15 @@ const QueryEditor = (props: Props) => {
 };
 
 const noOwnerTypes = ['Projects', 'ProjectItems', 'Code_Search'];
-const noRepositoryTypes = ['Projects', 'ProjectItems', 'Code_Search', 'CustomProperties'];
+const noRepositoryTypes = [
+  'Projects',
+  'ProjectItems',
+  'Code_Search',
+  'CustomProperties',
+  'Workflow_Failures',
+  'Action_Inventory',
+  'Repository_Governance',
+];
 
 function hasOwner(qt?: string) {
   return !noOwnerTypes.includes(qt as QueryType);

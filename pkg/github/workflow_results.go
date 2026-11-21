@@ -3,6 +3,7 @@ package github
 import (
 	"context"
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -40,24 +41,61 @@ func resultDuration(start, end *gh.Timestamp) *float64 {
 	v := end.Sub(start.Time).Seconds()
 	return &v
 }
+
 func workflowResultState(status, conclusion string) string {
 	if conclusion != "" {
 		return conclusion
 	}
 	return status
 }
+
 func failedStepSummary(j *gh.WorkflowJob, names []string) string {
 	if len(names) == 0 && (j.GetConclusion() == "failure" || j.GetConclusion() == "timed_out") {
 		return "No failed step reported"
 	}
 	return strings.Join(names, "; ")
 }
+
 func (r workflowJobResults) Frames() data.Frames {
 	var f *data.Frame
 	if r.steps {
-		f = data.NewFrame("workflow_steps", data.NewField("job_id", nil, []string{}), data.NewField("job_name", nil, []string{}), data.NewField("run_id", nil, []string{}), data.NewField("run_attempt", nil, []int64{}), data.NewField("step_number", nil, []int64{}), data.NewField("step_name", nil, []string{}), data.NewField("status", nil, []*string{}), data.NewField("conclusion", nil, []*string{}), data.NewField("state", nil, []string{}), data.NewField("started_at", nil, []*time.Time{}), data.NewField("completed_at", nil, []*time.Time{}), data.NewField("duration_seconds", nil, []*float64{}), data.NewField("html_url", nil, []string{}))
+		f = data.NewFrame(
+			"workflow_steps",
+			data.NewField("job_id", nil, []string{}),
+			data.NewField("job_name", nil, []string{}),
+			data.NewField("run_id", nil, []string{}),
+			data.NewField("run_attempt", nil, []int64{}),
+			data.NewField("step_number", nil, []int64{}),
+			data.NewField("step_name", nil, []string{}),
+			data.NewField("status", nil, []*string{}),
+			data.NewField("conclusion", nil, []*string{}),
+			data.NewField("state", nil, []string{}),
+			data.NewField("started_at", nil, []*time.Time{}),
+			data.NewField("completed_at", nil, []*time.Time{}),
+			data.NewField("duration_seconds", nil, []*float64{}),
+			data.NewField("html_url", nil, []string{}),
+		)
 	} else {
-		f = data.NewFrame("workflow_jobs", data.NewField("job_id", nil, []string{}), data.NewField("job_name", nil, []string{}), data.NewField("run_id", nil, []string{}), data.NewField("run_attempt", nil, []int64{}), data.NewField("workflow_name", nil, []string{}), data.NewField("status", nil, []*string{}), data.NewField("conclusion", nil, []*string{}), data.NewField("state", nil, []string{}), data.NewField("started_at", nil, []*time.Time{}), data.NewField("completed_at", nil, []*time.Time{}), data.NewField("duration_seconds", nil, []*float64{}), data.NewField("runner_name", nil, []string{}), data.NewField("runner_group", nil, []string{}), data.NewField("failed_steps", nil, []string{}), data.NewField("html_url", nil, []string{}))
+		f = data.NewFrame(
+			"workflow_jobs",
+			data.NewField("job_id", nil, []string{}),
+			data.NewField("job_name", nil, []string{}),
+			data.NewField("display_name", nil, []string{}),
+			data.NewField("result_priority", nil, []int64{}),
+			data.NewField("run_id", nil, []string{}),
+			data.NewField("run_attempt", nil, []int64{}),
+			data.NewField("workflow_name", nil, []string{}),
+			data.NewField("status", nil, []*string{}),
+			data.NewField("conclusion", nil, []*string{}),
+			data.NewField("state", nil, []string{}),
+			data.NewField("started_at", nil, []*time.Time{}),
+			data.NewField("completed_at", nil, []*time.Time{}),
+			data.NewField("duration_seconds", nil, []*float64{}),
+			data.NewField("runner_name", nil, []string{}),
+			data.NewField("runner_group", nil, []string{}),
+			data.NewField("failed_steps", nil, []string{}),
+			data.NewField("html_url", nil, []string{}),
+		)
 	}
 	for _, j := range r.jobs {
 		if j == nil {
@@ -68,16 +106,48 @@ func (r workflowJobResults) Frames() data.Frames {
 				if s == nil {
 					continue
 				}
-				f.AppendRow(strconv.FormatInt(j.GetID(), 10), j.GetName(), strconv.FormatInt(j.GetRunID(), 10), j.GetRunAttempt(), s.GetNumber(), s.GetName(), s.Status, s.Conclusion, workflowResultState(s.GetStatus(), s.GetConclusion()), s.StartedAt.GetTime(), s.CompletedAt.GetTime(), resultDuration(s.StartedAt, s.CompletedAt), j.GetHTMLURL())
+				f.AppendRow(
+					strconv.FormatInt(j.GetID(), 10),
+					j.GetName(),
+					strconv.FormatInt(j.GetRunID(), 10),
+					j.GetRunAttempt(),
+					s.GetNumber(),
+					s.GetName(),
+					s.Status,
+					s.Conclusion,
+					workflowResultState(s.GetStatus(), s.GetConclusion()),
+					s.StartedAt.GetTime(),
+					s.CompletedAt.GetTime(),
+					resultDuration(s.StartedAt, s.CompletedAt),
+					j.GetHTMLURL(),
+				)
 			}
 		} else {
 			failed := []string{}
 			for _, s := range j.Steps {
 				if s != nil && (s.GetConclusion() == "failure" || s.GetConclusion() == "timed_out") {
-					failed = append(failed, s.GetName())
+					failed = append(failed, fmt.Sprintf("Step %d · %s", s.GetNumber(), s.GetName()))
 				}
 			}
-			f.AppendRow(strconv.FormatInt(j.GetID(), 10), j.GetName(), strconv.FormatInt(j.GetRunID(), 10), j.GetRunAttempt(), j.GetWorkflowName(), j.Status, j.Conclusion, workflowResultState(j.GetStatus(), j.GetConclusion()), j.StartedAt.GetTime(), j.CompletedAt.GetTime(), resultDuration(j.StartedAt, j.CompletedAt), j.GetRunnerName(), j.GetRunnerGroupName(), failedStepSummary(j, failed), j.GetHTMLURL())
+			f.AppendRow(
+				strconv.FormatInt(j.GetID(), 10),
+				j.GetName(),
+				workflowJobLabel(j),
+				workflowJobPriority(j),
+				strconv.FormatInt(j.GetRunID(), 10),
+				j.GetRunAttempt(),
+				j.GetWorkflowName(),
+				j.Status,
+				j.Conclusion,
+				workflowResultState(j.GetStatus(), j.GetConclusion()),
+				j.StartedAt.GetTime(),
+				j.CompletedAt.GetTime(),
+				resultDuration(j.StartedAt, j.CompletedAt),
+				j.GetRunnerName(),
+				j.GetRunnerGroupName(),
+				failedStepSummary(j, failed),
+				j.GetHTMLURL(),
+			)
 		}
 	}
 	f.Meta = &data.FrameMeta{PreferredVisualization: data.VisTypeTable}
@@ -101,10 +171,17 @@ func (d *Datasource) HandleWorkflowJobsQuery(ctx context.Context, query *models.
 		if err != nil || id <= 0 {
 			return nil, fmt.Errorf("job ID must be a positive GitHub job ID")
 		}
-		job, err := d.client.GetWorkflowJobResult(ctx, query.Owner, query.Repository, id)
+		cached, err := d.cachedActionQuery(ctx, []any{"job", query.Owner, query.Repository, id}, func() (dfutil.Framer, error) {
+			job, err := d.client.GetWorkflowJobResult(ctx, query.Owner, query.Repository, id)
+			if err != nil {
+				return nil, err
+			}
+			return workflowJobResults{jobs: []*gh.WorkflowJob{job}}, nil
+		})
 		if err != nil {
 			return nil, err
 		}
+		job := cached.(workflowJobResults).jobs[0]
 		if opt.RunID != "" && strconv.FormatInt(job.GetRunID(), 10) != opt.RunID {
 			return nil, fmt.Errorf("selected job does not belong to the selected workflow run")
 		}
@@ -128,9 +205,25 @@ func (d *Datasource) HandleWorkflowJobsQuery(ctx context.Context, query *models.
 			return nil, fmt.Errorf("attempt must be a positive integer")
 		}
 	}
-	result.jobs, result.limited, err = d.client.GetWorkflowJobResults(ctx, query.Owner, query.Repository, id, attempt)
-	return result, err
+	cached, err := d.cachedActionQuery(ctx, []any{"jobs", query.Owner, query.Repository, id, attempt}, func() (dfutil.Framer, error) {
+		jobs, limited, err := d.client.GetWorkflowJobResults(ctx, query.Owner, query.Repository, id, attempt)
+		if err != nil {
+			return nil, err
+		}
+		return workflowJobResults{jobs: jobs, limited: limited}, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	result = cached.(workflowJobResults)
+	result.steps = steps
+	if opt.FailureFirst {
+		result.jobs = append([]*gh.WorkflowJob(nil), result.jobs...)
+		sort.SliceStable(result.jobs, func(i, j int) bool { return workflowJobPriority(result.jobs[i]) < workflowJobPriority(result.jobs[j]) })
+	}
+	return result, nil
 }
+
 func (s *QueryHandler) workflowResults(ctx context.Context, req *backend.QueryDataRequest, steps bool) (*backend.QueryDataResponse, error) {
 	return &backend.QueryDataResponse{Responses: processQueries(ctx, req, func(ctx context.Context, q backend.DataQuery) backend.DataResponse {
 		query := &models.WorkflowJobsQuery{}
@@ -140,9 +233,53 @@ func (s *QueryHandler) workflowResults(ctx context.Context, req *backend.QueryDa
 		return dfutil.FrameResponseWithError(s.Datasource.HandleWorkflowJobsQuery(ctx, query, q, steps))
 	})}, nil
 }
+
 func (s *QueryHandler) HandleWorkflowJobs(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
 	return s.workflowResults(ctx, req, false)
 }
+
 func (s *QueryHandler) HandleWorkflowSteps(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
 	return s.workflowResults(ctx, req, true)
+}
+
+func workflowJobPriority(j *gh.WorkflowJob) int64 {
+	switch workflowResultState(j.GetStatus(), j.GetConclusion()) {
+	case "failure":
+		return 0
+	case "timed_out":
+		return 1
+	case "action_required":
+		return 2
+	case "in_progress":
+		return 3
+	case "queued", "waiting", "pending":
+		return 4
+	case "cancelled":
+		return 5
+	case "success":
+		return 6
+	case "skipped":
+		return 7
+	}
+	return 8
+}
+
+func workflowJobLabel(j *gh.WorkflowJob) string {
+	state := workflowResultState(j.GetStatus(), j.GetConclusion())
+	label := state
+	switch state {
+	case "failure":
+		label = "Failed"
+	case "timed_out":
+		label = "Timed out"
+	case "success":
+		label = "Successful"
+	case "cancelled":
+		label = "Cancelled"
+	case "skipped":
+		label = "Skipped"
+	case "in_progress":
+		label = "In progress"
+	}
+	return label + " · " + j.GetName()
 }
