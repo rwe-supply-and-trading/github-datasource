@@ -12,6 +12,19 @@
 - Add full-SHA Action inventory from workflow YAML, reachable composite/reusable definitions and explicit scan boundaries.
 - Reuse matching interactive query results through a bounded instance-local cache; preserve SDK-safe REST error classification and run/job identity guards.
 
+## 2.11.0
+
+### Minor Changes
+
+🚀 Add Webhook Deliveries query type for monitoring webhook delivery success rates and failures
+
+### Patch Changes
+
+🐛 Fix $__multiVar for values that contain spaces
+🐛 Security: bump moment and fast-uri to patched versions, and pin `@grafana/*` packages to 13.1.9
+🐛 Security: update frontend dependencies to fix CVEs
+⚙️ Chore: update frontend & backend dependencies
+
 ## 2.10.0-rwe.1
 
 - Align the private fork with upstream main at 6f39c64, including Check Runs, Pull Requests for Branches, Webhook Deliveries, dependency/security fixes, and the multi-variable whitespace fix.
@@ -20,8 +33,13 @@
 
 ## 2.10.0
 
+### Minor Changes
+
 🚀 Add Pull Requests for Branches query type
 
+### Patch Changes
+
+🐛 Fix a connection freeze between Grafana and the plugin under heavy query load by updating google.golang.org/grpc to v1.85.0 ([grpc/grpc-go#9330](https://github.com/grpc/grpc-go/issues/9330))
 ⚙️ Chore: Updated frontend & backend dependencies
 
 ## 2.9.6
@@ -35,6 +53,10 @@
 ⚙️ Chore: Updated backend dependencies
 
 ## 2.9.4
+
+### Minor Changes
+
+🚀 Add a Check Runs query type that lists the check runs reported against a commit, branch, or tag, including status, conclusion, and duration
 
 ### Patch Changes
 
@@ -53,18 +75,6 @@
 
 ⚙️ Chore: Updated backend dependencies.
 ⚙️ Chore: Publish data source configuration schemas for provisioning and automation.
-
-## 2.9.2-rwe.2
-
-- Replace the legacy repository search with paginated organization metadata, custom-property columns, and property filtering.
-- Add organization custom-property schema queries for dashboard variables and inspection.
-- Add generic code search for files and content, with exact-path filtering, text fragments, and optional complete-result enforcement.
-
-## 2.9.2-rwe.1
-
-- Rebase the private fork release on upstream 2.9.2, including published data source configuration schemas.
-- Add GitHub Enterprise Cloud data-residency endpoints for REST, GraphQL, and GitHub App token exchange.
-- Change the plugin ID to `rwe-github-datasource` for private distribution and signing.
 
 ## 2.9.1
 
