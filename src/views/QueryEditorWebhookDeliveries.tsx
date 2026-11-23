@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Input, Combobox, ComboboxOption } from '@grafana/ui';
 import { EditorField, EditorRow } from '@grafana/plugin-ui';
 import { RightColumnWidth } from './QueryEditor';
@@ -17,9 +17,6 @@ const statusOptions: ComboboxOption[] = [
 ];
 
 export const QueryEditorWebhookDeliveries = (props: Props) => {
-  const [hookId, setHookId] = useState<string>(props.hookId || '');
-  const [event, setEvent] = useState<string>(props.event || '');
-
   return (
     <EditorRow>
       <EditorField
@@ -29,8 +26,8 @@ export const QueryEditorWebhookDeliveries = (props: Props) => {
         <Input
           aria-label={components.QueryEditor.WebhookDeliveries.hookIdInput}
           width={RightColumnWidth}
-          value={hookId}
-          onChange={(el) => setHookId(el.currentTarget.value)}
+          key={props.hookId ?? ''}
+          defaultValue={props.hookId ?? ''}
           onBlur={(el) => props.onChange({ ...props, hookId: el.currentTarget.value })}
         />
       </EditorField>
@@ -41,8 +38,8 @@ export const QueryEditorWebhookDeliveries = (props: Props) => {
         <Input
           aria-label={components.QueryEditor.WebhookDeliveries.eventInput}
           width={RightColumnWidth}
-          value={event}
-          onChange={(el) => setEvent(el.currentTarget.value)}
+          key={props.event ?? ''}
+          defaultValue={props.event ?? ''}
           onBlur={(el) => props.onChange({ ...props, event: el.currentTarget.value })}
         />
       </EditorField>

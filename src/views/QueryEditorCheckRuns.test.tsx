@@ -27,4 +27,18 @@ describe('QueryEditorCheckRuns', () => {
 
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ gitRef: 'heads/main' }));
   });
+
+  it('restores changed refs and names without submitting stale drafts', () => {
+    const onChange = jest.fn();
+    const { rerender } = render(<QueryEditorCheckRuns gitRef="old-ref" checkName="old-check" onChange={onChange} />);
+    fireEvent.change(screen.getByDisplayValue('old-ref'), { target: { value: 'uncommitted-ref' } });
+    fireEvent.change(screen.getByDisplayValue('old-check'), { target: { value: 'uncommitted-check' } });
+    rerender(<QueryEditorCheckRuns gitRef="new-ref" checkName="new-check" onChange={onChange} />);
+    expect(screen.getByDisplayValue('new-ref')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('new-check')).toBeInTheDocument();
+    fireEvent.blur(screen.getByDisplayValue('new-check'));
+    expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ gitRef: 'new-ref', checkName: 'new-check' }));
+    fireEvent.blur(screen.getByDisplayValue('new-ref'));
+    expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ gitRef: 'new-ref', checkName: 'new-check' }));
+  });
 });

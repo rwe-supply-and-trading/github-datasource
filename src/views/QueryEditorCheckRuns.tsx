@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Combobox, type ComboboxOption, Input } from '@grafana/ui';
 import { EditorField, EditorRow } from '@grafana/plugin-ui';
 import { RightColumnWidth } from './QueryEditor';
@@ -22,26 +22,26 @@ const filterOptions: Array<ComboboxOption<string>> = [
 ];
 
 export const QueryEditorCheckRuns = (props: Props) => {
-  const [gitRef, setGitRef] = useState<string>(props.gitRef || '');
-  const [checkName, setCheckName] = useState<string>(props.checkName || '');
-
   return (
     <EditorRow>
-      <EditorField label="Ref" tooltip="The commit SHA, branch (heads/<branch>), or tag (tags/<tag>) to list check runs for">
+      <EditorField
+        label="Ref"
+        tooltip="The commit SHA, branch (heads/<branch>), or tag (tags/<tag>) to list check runs for"
+      >
         <Input
           aria-label={components.QueryEditor.Ref.input}
           width={RightColumnWidth}
-          value={gitRef}
-          onChange={(el) => setGitRef(el.currentTarget.value)}
-          onBlur={(el) => props.onChange({ ...props, checkName, gitRef: el.currentTarget.value })}
+          key={props.gitRef ?? ''}
+          defaultValue={props.gitRef ?? ''}
+          onBlur={(el) => props.onChange({ ...props, gitRef: el.currentTarget.value })}
         />
       </EditorField>
       <EditorField label="Check name" tooltip="Only return check runs with this exact name (can be left empty)">
         <Input
           width={RightColumnWidth}
-          value={checkName}
-          onChange={(el) => setCheckName(el.currentTarget.value)}
-          onBlur={(el) => props.onChange({ ...props, gitRef, checkName: el.currentTarget.value })}
+          key={props.checkName ?? ''}
+          defaultValue={props.checkName ?? ''}
+          onBlur={(el) => props.onChange({ ...props, checkName: el.currentTarget.value })}
         />
       </EditorField>
       <EditorField label="Status" tooltip="Only return check runs with this status">
@@ -49,7 +49,7 @@ export const QueryEditorCheckRuns = (props: Props) => {
           width={RightColumnWidth}
           options={statusOptions}
           value={props.status || ''}
-          onChange={(value) => props.onChange({ ...props, gitRef, checkName, status: value?.value })}
+          onChange={(value) => props.onChange({ ...props, status: value?.value })}
         />
       </EditorField>
       <EditorField
@@ -60,7 +60,7 @@ export const QueryEditorCheckRuns = (props: Props) => {
           width={RightColumnWidth}
           options={filterOptions}
           value={props.filter || 'latest'}
-          onChange={(value) => props.onChange({ ...props, gitRef, checkName, filter: value?.value })}
+          onChange={(value) => props.onChange({ ...props, filter: value?.value })}
         />
       </EditorField>
     </EditorRow>

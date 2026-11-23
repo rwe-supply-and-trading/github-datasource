@@ -1,5 +1,5 @@
 import { map, Observable } from 'rxjs';
-import { TemplateSrv } from '@grafana/runtime';
+import { TemplateSrv, type VariableInterpolation } from '@grafana/runtime';
 import { ScopedVars, CustomVariableSupport, DataQueryResponse, DataQueryRequest, DataFrameView } from '@grafana/data';
 import { GitHubDataSource } from './DataSource';
 import VariableQueryEditor from 'views/VariableQueryEditor';
@@ -23,6 +23,39 @@ export const replaceVariables = (t: TemplateSrv, query: GitHubQuery, scoped: Sco
   return updatedQuery;
 };
 
+// Resolve actual array selections before applying their requested formatting.
+// CSV delimiters cannot distinguish branch-name commas from selection boundaries.
+const interpolateArrayItem = (t: TemplateSrv, input: string, scoped: ScopedVars): string[] => {
+  const interpolations: VariableInterpolation[] = [];
+  const formatted = t.replace(input, scoped, 'csv', interpolations);
+  let scopes = [scoped];
+  let expanded = false;
+  for (const name of new Set(interpolations.map((item) => item.variableName))) {
+    // Explicit transformations such as :regex, :json and field access retain
+    // their scalar formatting rather than being reinterpreted as lists.
+    if (
+      interpolations.some(
+        (item) =>
+          item.variableName === name &&
+          (item.fieldPath || (item.format && item.format !== 'csv' && item.format !== 'raw'))
+      )
+    ) {
+      continue;
+    }
+    let selection: string | string[] | undefined;
+    t.replace(`\${${name}}`, scoped, (value: string | string[]) => {
+      selection = value;
+      return '';
+    });
+    if (Array.isArray(selection)) {
+      const values = selection;
+      expanded = true;
+      scopes = scopes.flatMap((vars) => values.map((value) => ({ ...vars, [name]: { value, text: value } })));
+    }
+  }
+  return expanded ? scopes.map((vars) => t.replace(input, vars, 'csv')) : [formatted];
+};
+
 const interpolateObject = (input: any, t: TemplateSrv, scoped: ScopedVars = {}) => {
   let newOptions = { ...input };
   Object.keys(newOptions).forEach((key) => {
@@ -39,17 +72,7 @@ const interpolateObject = (input: any, t: TemplateSrv, scoped: ScopedVars = {}) 
           if (typeof opt !== 'string') {
             return [interpolateObject(opt, t, scoped)];
           }
-          const value = replaceVariable(t, opt, scoped, 'csv') ?? '';
-          // Only an interpolated item is split, so a literal comma (valid in a branch name) survives
-          // while a multi-value variable still expands into one item per value.
-          // shortcut: a single-value variable whose value contains a comma is still split; upgrade to
-          // asking TemplateSrv for the variable's multi-value flag if that ever matters.
-          return value === opt
-            ? [opt]
-            : value
-                .split(',')
-                .map((v) => v.trim())
-                .filter(Boolean);
+          return interpolateArrayItem(t, opt, scoped);
         });
         newOptions = { ...newOptions, [key]: replaced };
       }
