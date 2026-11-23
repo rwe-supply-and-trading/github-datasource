@@ -1,4 +1,4 @@
-import { QueryType } from './types/query'
+import { QueryType } from './types/query';
 
 export const QueryTypes = [
   'Check_Runs',
@@ -31,12 +31,16 @@ export const QueryTypes = [
   'Workflow_Runs',
   'Workflow_Jobs',
   'Workflow_Steps',
+  'Workflow_Run',
+  'Workflow_Attempts',
+  'Workflow_Failures',
+  'Action_Inventory',
+  'Repository_Governance',
   'Deployments',
   'Webhook_Deliveries',
 ] as const;
 
-
-export const DefaultQueryType: QueryType = "Issues";
+export const DefaultQueryType: QueryType = 'Issues';
 
 export enum PackageType {
   NPM = 'NPM',

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Combobox, ComboboxOption } from '@grafana/ui';
+import { Combobox, ComboboxOption, Switch } from '@grafana/ui';
 import { EditorField, EditorRow } from '@grafana/plugin-ui';
 import { RightColumnWidth } from './QueryEditor';
 import { WorkflowsTimeField } from './../constants';
@@ -37,6 +37,15 @@ export const QueryEditorWorkflows = (props: Props) => {
               timeField: opt.value,
             });
           }}
+        />
+      </EditorField>
+      <EditorField
+        label="Include all choice"
+        tooltip="Add an explicit All workflows option with key __all__ for workflow selectors."
+      >
+        <Switch
+          value={props.includeAll || false}
+          onChange={(e) => props.onChange({ ...props, includeAll: e.currentTarget.checked })}
         />
       </EditorField>
     </EditorRow>

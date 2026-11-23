@@ -6,10 +6,18 @@ The GitHub data source plugin for Grafana lets you to query the GitHub API in Gr
 
 This private fork currently incorporates upstream `grafana/github-datasource`
 through `6f39c6429a7d9ab6a18e447ef51a2bf2cd1611f5` (checked 2026-11-16).
-Its release base is 2.10.0; the prepared RWE version is **2.10.0-rwe.1**.
+Its release base is 2.10.0; the prepared RWE version is **2.11.0-rwe.1**.
 The RWE plugin identity, Enterprise Cloud data-residency support, governance
 queries and workflow job/step queries remain available. See
 [upstream alignment](docs/upstream-alignment.md) for the integration decisions.
+
+## Repository governance
+
+Read [Repository governance queries](docs/repository-governance.md) for ownership counts, review findings and bounded selected-repository configuration inspection through the existing App connection.
+
+## Action dashboards
+
+Read [Action investigation queries](docs/action-queries.md) for exact workflow attempts, failure-oriented jobs, bounded cross-repository failure discovery and SHA-based Action inventory. These queries reuse the existing connection and run only when requested.
 
 ## Documentation
 
@@ -40,12 +48,12 @@ Follow [Release and deploy the private GitHub data source](docs/private-plugin-r
 
 Watch this video to learn more about setting up the Grafana GitHub data source plugin:
 
-[![GitHub data source plugin | Visualize GitHub using Grafana | Tutorial](https://img.youtube.com/vi/DW693S3cO48/hq720.jpg)](https://youtu.be/DW693S3cO48 "Grafana GitHub data source plugin")
+[![GitHub data source plugin | Visualize GitHub using Grafana | Tutorial](https://img.youtube.com/vi/DW693S3cO48/hq720.jpg)](https://youtu.be/DW693S3cO48 'Grafana GitHub data source plugin')
 
 > [!TIP]
-> 
+>
 > ## Give it a try using Grafana Play
-> 
+>
 > With Grafana Play, you can explore and see how it works, learning from practical examples to accelerate your development. This feature can be seen on [GitHub data source plugin demo](https://play.grafana.org/d/d5b56357-1a57-4821-ab27-16fdf79cab57/github3a-queries-and-multi-variables).
 
 ## GitHub API V4 (GraphQL)

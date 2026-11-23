@@ -46,9 +46,14 @@ const (
 	// QueryTypeWorkflowUsage is used when querying a specific workflow usage
 	QueryTypeWorkflowUsage QueryType = "Workflow_Usage"
 	// QueryTypeWorkflowRuns is used when querying workflow runs for a repository
-	QueryTypeWorkflowRuns  QueryType = "Workflow_Runs"
-	QueryTypeWorkflowJobs  QueryType = "Workflow_Jobs"
-	QueryTypeWorkflowSteps QueryType = "Workflow_Steps"
+	QueryTypeWorkflowRuns         QueryType = "Workflow_Runs"
+	QueryTypeWorkflowJobs         QueryType = "Workflow_Jobs"
+	QueryTypeWorkflowSteps        QueryType = "Workflow_Steps"
+	QueryTypeWorkflowRun          QueryType = "Workflow_Run"
+	QueryTypeWorkflowAttempts     QueryType = "Workflow_Attempts"
+	QueryTypeWorkflowFailures     QueryType = "Workflow_Failures"
+	QueryTypeActionInventory      QueryType = "Action_Inventory"
+	QueryTypeRepositoryGovernance QueryType = "Repository_Governance"
 	// QueryTypeCodeScanning is used when querying code scanning alerts for a repository
 	QueryTypeCodeScanning QueryType = "Code_Scanning"
 	// QueryTypeCodeSearch is used when searching repository contents

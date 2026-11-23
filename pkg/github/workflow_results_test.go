@@ -1,12 +1,13 @@
 package github
 
 import (
+	"testing"
+	"time"
+
 	gh "github.com/google/go-github/v84/github"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
-	"time"
 )
 
 func workflowResultValue(t *testing.T, frame *data.Frame, name string, row int) any {
@@ -24,12 +25,12 @@ func TestWorkflowJobResultsKeepJobConclusionIndependentOfSteps(t *testing.T) {
 	t.Parallel()
 	start := time.Date(2026, time.November, 16, 8, 0, 0, 0, time.UTC)
 	end := start.Add(10 * time.Second)
-	job := &gh.WorkflowJob{ID: ptr(int64(9007199254740993)), RunID: ptr(int64(42)), RunAttempt: ptr(int64(2)), Name: ptr("Build"), Status: ptr("completed"), Conclusion: ptr("success"), StartedAt: &gh.Timestamp{Time: start}, CompletedAt: &gh.Timestamp{Time: end}, Steps: []*gh.TaskStep{{Name: ptr("Optional check"), Conclusion: ptr("failure")}}}
+	job := &gh.WorkflowJob{ID: ptr(int64(9007199254740993)), RunID: ptr(int64(42)), RunAttempt: ptr(int64(2)), Name: ptr("Build"), Status: ptr("completed"), Conclusion: ptr("success"), StartedAt: &gh.Timestamp{Time: start}, CompletedAt: &gh.Timestamp{Time: end}, Steps: []*gh.TaskStep{{Number: ptr(int64(3)), Name: ptr("Optional check"), Conclusion: ptr("failure")}}}
 	frame := (workflowJobResults{jobs: []*gh.WorkflowJob{job}}).Frames()[0]
 	assert.Equal(t, "9007199254740993", workflowResultValue(t, frame, "job_id", 0), "job identity must not lose precision through a float")
 	assert.Equal(t, int64(2), workflowResultValue(t, frame, "run_attempt", 0))
 	assert.Equal(t, "success", workflowResultValue(t, frame, "state", 0), "a failed step must not overwrite the GitHub job conclusion")
-	assert.Equal(t, "Optional check", workflowResultValue(t, frame, "failed_steps", 0))
+	assert.Equal(t, "Step 3 · Optional check", workflowResultValue(t, frame, "failed_steps", 0))
 	duration := workflowResultValue(t, frame, "duration_seconds", 0)
 	require.IsType(t, (*float64)(nil), duration)
 	assert.Equal(t, 10.0, *duration.(*float64))

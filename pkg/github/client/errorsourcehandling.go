@@ -26,6 +26,25 @@ var (
 	}
 )
 
+// rateLimitError retains the rate-limit signal without exposing go-github's
+// unsafe Is implementation to the SDK. It deliberately does not unwrap the
+// original error.
+type rateLimitError struct {
+	message string
+}
+
+func (e *rateLimitError) Error() string { return e.message }
+
+// IsRateLimitError recognizes both raw GitHub limits and sanitized limits.
+func IsRateLimitError(err error) bool {
+	var (
+		safe      *rateLimitError
+		primary   *googlegithub.RateLimitError
+		secondary *googlegithub.AbuseRateLimitError
+	)
+	return errors.As(err, &safe) || errors.As(err, &primary) || errors.As(err, &secondary)
+}
+
 // sanitizeGitHubError converts a *github.ErrorResponse into a plain error to
 // prevent a nil pointer dereference panic in the SDK's error handling.
 //
@@ -39,15 +58,16 @@ func sanitizeGitHubError(err error) error {
 	// Flatten to a plain error to drop the unsafe Is method while keeping the
 	// message. These are every go-github error type that defines such an Is (github.go).
 	var (
-		errResp   *googlegithub.ErrorResponse
-		rateErr   *googlegithub.RateLimitError
-		abuseErr  *googlegithub.AbuseRateLimitError
-		acceptErr *googlegithub.AcceptedError
-		redirectErr  *googlegithub.RedirectionError
+		errResp     *googlegithub.ErrorResponse
+		rateErr     *googlegithub.RateLimitError
+		abuseErr    *googlegithub.AbuseRateLimitError
+		acceptErr   *googlegithub.AcceptedError
+		redirectErr *googlegithub.RedirectionError
 	)
+	if errors.As(err, &rateErr) || errors.As(err, &abuseErr) {
+		return &rateLimitError{message: err.Error()}
+	}
 	if errors.As(err, &errResp) ||
-		errors.As(err, &rateErr) ||
-		errors.As(err, &abuseErr) ||
 		errors.As(err, &acceptErr) ||
 		errors.As(err, &redirectErr) {
 		return fmt.Errorf("%s", err.Error())
