@@ -58,10 +58,9 @@ func (c *Client) ResolveActionInventoryRevision(ctx context.Context, owner, repo
 func (c *Client) ActionInventoryFiles(ctx context.Context, owner, repo, revision string) ([]*gh.RepositoryContent, error) {
 	_, files, resp, err := c.restClient.Repositories.GetContents(ctx, owner, repo, ".github/workflows", &gh.RepositoryContentGetOptions{Ref: revision})
 	if err != nil {
-		if resp != nil && resp.Response != nil && resp.StatusCode == 404 {
-			return nil, nil
-		}
-		return nil, addErrorSourceToError(fmt.Errorf("listing workflow files: %w", err), resp)
+		// A 404 can mean either a missing directory or unavailable Contents
+		// access. Neither establishes a complete scan with zero workflows.
+		return nil, addErrorSourceToError(fmt.Errorf("workflow directory unavailable; verify path and Contents read access: %w", err), resp)
 	}
 	return files, nil
 }

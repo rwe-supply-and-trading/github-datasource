@@ -1,3 +1,34 @@
+# Upstream alignment — 2026-11-21
+
+The current integration incorporates two additional `grafana/github-datasource`
+commits through [`5917ad1`](https://github.com/grafana/github-datasource/commit/5917ad1c84f6bfe8c22c6e49ea46a1632c837d94):
+
+- [`7e74934`](https://github.com/grafana/github-datasource/commit/7e74934ec4f178bca4cc1aaaf424125c496516f6): refresh transitive frontend dependencies for security fixes and deduplicate the lockfile dependency tree.
+- [`5917ad1`](https://github.com/grafana/github-datasource/commit/5917ad1c84f6bfe8c22c6e49ea46a1632c837d94): prepare upstream 2.11.0, enable private-package versioning without Changesets tags, and move already released changesets into the changelog.
+
+The private version stays **2.11.0-rwe.1**, now based on released upstream
+**2.11.0**. The complete upstream dependency graph is retained with RWE root
+package identity and version. Conflicts in package metadata and the changelog
+were resolved without replacing the RWE package name, repository, author or
+private release sections. No Go or query/editor implementation changes are
+introduced by these two upstream commits.
+
+Both changesets configuration and the released-changeset cleanup are adopted.
+The existing manual private signing/release workflow remains authoritative;
+there is no switch to Grafana's public publication workflow. Workflow analysis,
+SHA inventory, repository governance, endpoint handling and SDK-safe error
+classification remain present.
+
+The integration was prepared with `--no-commit` and subsequently committed as
+`8de7ba8` (`chore(deps): merge upstream 2.11.0 updates`). The follow-up review on
+2026-11-23 confirmed the upstream dependency graph and corrected workflow-directory
+404 handling: unavailable source access no longer reports a complete empty scan.
+Validation results are recorded in the dashboard-publisher review evidence for
+each date. Test execution and release archives remain excluded from these reviews;
+signing, publication and deployment were not performed by the integration step.
+
+The following section is historical evidence for the earlier integration.
+
 # Upstream alignment — 2026-11-16
 
 The private RWE fork incorporates `grafana/github-datasource` main through
